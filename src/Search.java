@@ -152,16 +152,8 @@ public class Search {
 
 	public static void solveTest() {
 		CubieCube.initSym();
-		// System.out.println(CubieCube.SymMove[2][0]);
 
-		Phase1Search.TCenterMove = (int[][]) Tools.LoadFromFile("Phase1TCenterMove.jdata");
-		Phase1Search.XCenterMove = (int[][]) Tools.LoadFromFile("Phase1XCenterMove.jdata");
-		if (Phase1Search.TCenterMove == null || Phase1Search.XCenterMove == null) {
-			Phase1Search.initCenterMove();
-			Tools.SaveToFile("Phase1TCenterMove.jdata", Phase1Search.TCenterMove);
-			Tools.SaveToFile("Phase1XCenterMove.jdata", Phase1Search.XCenterMove);
-		}
-		Phase1Search.initCenterPrun();
+		Phase1Search.initCenter();
 
 		Phase2Search.initCenterMove();
 		Phase2Search.initCenterPrun();

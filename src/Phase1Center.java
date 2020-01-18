@@ -119,4 +119,43 @@ class Phase1Center {
 			break;
 		}
 	}
+
+	void doConj(int conj) {
+		switch (conj) {
+		case 0: //x
+			doMove(rx1);
+			doMove(lx3);
+			swap(tCenter, 0, 14, 4, 8, 0);
+			swap(tCenter, 2, 12, 6, 10, 0);
+
+			break;
+		case 1: //y2
+			doMove(ux2);
+			doMove(dx2);
+			swap(tCenter, 9, 21, 13, 17, 1);
+			swap(tCenter, 11, 23, 15, 19, 1);
+			break;
+		case 2: //lr mirror
+			swap(tCenter, 1, 3);
+			swap(tCenter, 5, 7);
+			swap(tCenter, 9, 11);
+			swap(tCenter, 13, 15);
+			swap(tCenter, 16, 20);
+			swap(tCenter, 17, 23);
+			swap(tCenter, 18, 22);
+			swap(tCenter, 19, 21);
+			swap(xCenter, 0, 1);
+			swap(xCenter, 2, 3);
+			swap(xCenter, 4, 5);
+			swap(xCenter, 6, 7);
+			swap(xCenter, 8, 9);
+			swap(xCenter, 10, 11);
+			swap(xCenter, 12, 13);
+			swap(xCenter, 14, 15);
+			swap(xCenter, 16, 21);
+			swap(xCenter, 17, 20);
+			swap(xCenter, 18, 23);
+			swap(xCenter, 19, 22);
+		}
+	}
 }
