@@ -1,160 +1,153 @@
 package cs.cube555;
 
+import java.util.ArrayList;
+
 import static cs.cube555.Util.*;
 
 public class Search {
 	static long startTime;
 
-	static void printSolution(int[] solution, int cumlen) {
+	static void printSolution(int[] solution) {
 		StringBuffer sb = new StringBuffer();
 		for (int move : solution) {
 			sb.append(move2str[move]).append(' ');
 		}
-		sb.append(String.format("(%df, %df, %dms)", solution.length, cumlen, (System.nanoTime() - startTime) / 1000000));
+		sb.append(String.format("(%df)", solution.length));
 		System.out.println(sb);
 	}
 
 	static void solveSingle(CubieCube cc) {
+		Phase1Search p1search = new Phase1Search();
+		Phase2Search p2search = new Phase2Search();
+		Phase3Search p3search = new Phase3Search();
+		Phase4Search p4search = new Phase4Search();
+		Phase5Search p5search = new Phase5Search();
+
+		int phase1SolsSize = 10;
+		int phase2SolsSize = 500;
+		int phase3SolsSize = 500;
+		int phase4SolsSize = 500;
+		int phase5SolsSize = 1;
 		int sollen = 0;
 		startTime = System.nanoTime();
 		System.out.println(cc);
-		Phase1Search p1search = new Phase1Search();
-		java.util.ArrayList<int[]> p1sols = new java.util.ArrayList<int[]>();
+		cc = new SolvingCube(cc);
 
-		CubieCube[] p1cc = new CubieCube[3];
+		SolvingCube[] p1cc = new SolvingCube[3];
 		for (int i = 0; i < 3; i++) {
-			p1cc[i] = new CubieCube(cc);
+			p1cc[i] = new SolvingCube(cc);
 			cc.doConj(16);
 		}
-		int[] p1ccidx = new int[1];
-
+		ArrayList<SolvingCube> p1sols = new ArrayList<SolvingCube>();
 		p1search.solve(p1cc, new SolutionChecker() {
-			int check(int[] solution, int length, int ccidx) {
-				p1ccidx[0] = ccidx;
-				p1sols.add(copySolution(solution, length));
-				return 0;
-			}
-		});
-		cc.copy(p1cc[p1ccidx[0]]);
-		System.out.println("P1Conj: " + p1ccidx[0]);
-		for (int[] sol : p1sols) {
-			cc.doMove(sol);
-			printSolution(sol, sollen += sol.length);
-			break;
-		}
-		// System.out.println("Phase1 Solved");
-		// System.out.println(cc.toFacelet());
-		// System.out.println(cc);
-
-		Phase2Search p2search = new Phase2Search();
-		java.util.ArrayList<int[]> p2sols = new java.util.ArrayList<int[]>();
-		p2search.solve(new CubieCube[] {cc}, new SolutionChecker() {
-			int check(int[] solution, int length, int ccidx) {
-				p2sols.add(copySolution(solution, length));
-				return 0;
-			}
-		});
-		for (int[] sol : p2sols) {
-			cc.doMove(sol);
-			printSolution(sol, sollen += sol.length);
-			break;
-		}
-		// System.out.println("Phase2 Solved");
-		// System.out.println(cc.toFacelet());
-		// System.out.println(cc);
-
-		Phase3Search p3search = new Phase3Search();
-		java.util.ArrayList<int[]> p3sols = new java.util.ArrayList<int[]>();
-		p3search.solve(new CubieCube[] {cc}, new SolutionChecker() {
 			@Override
 			int check(int[] solution, int length, int ccidx) {
-				CubieCube cc1 = new CubieCube(cc);
+				SolvingCube sc = new SolvingCube(p1cc[ccidx]);
+				sc.doMove(copySolution(solution, length));
+				p1sols.add(sc);
+				return p1sols.size() >= phase1SolsSize ? 0 : 1;
+			}
+		});
+		System.out.println(String.format("Phase1 Finished in %d ms", (System.nanoTime() - startTime) / 1000000));
+		startTime = System.nanoTime();
+		for (SolvingCube sc : p1sols) {
+			sc.addCheckPoint();
+			// System.out.println(sc);
+		}
+
+		ArrayList<SolvingCube> p2sols = new ArrayList<SolvingCube>();
+		p2search.solve(p1sols.toArray(new SolvingCube[0]), new SolutionChecker() {
+			@Override
+			int check(int[] solution, int length, int ccidx) {
+				SolvingCube sc = new SolvingCube(p1sols.get(ccidx));
+				sc.doMove(copySolution(solution, length));
+				p2sols.add(new SolvingCube(sc));
+				sc.doConj(16);
+				p2sols.add(new SolvingCube(sc));
+				sc.doConj(16);
+				p2sols.add(new SolvingCube(sc));
+				return p2sols.size() >= phase2SolsSize ? 0 : 1;
+			}
+		});
+		System.out.println(String.format("Phase2 Finished in %d ms", (System.nanoTime() - startTime) / 1000000));
+		startTime = System.nanoTime();
+		for (SolvingCube sc : p2sols) {
+			sc.addCheckPoint();
+			// System.out.println(sc);
+		}
+
+		ArrayList<SolvingCube> p3sols = new ArrayList<SolvingCube>();
+		p3search.solve(p2sols.toArray(new SolvingCube[0]), new SolutionChecker() {
+			@Override
+			int check(int[] solution, int length, int ccidx) {
+				SolvingCube sc = new SolvingCube(p2sols.get(ccidx));
 				for (int i = 0; i < length; i++) {
-					cc1.doMove(solution[i]);
+					sc.doMove(solution[i]);
 				}
 				int maskY = 0;
 				int maskZ = 0;
 				for (int i = 0; i < 4; i++) {
-					maskY |= 1 << (cc1.wEdge[8 + i] % 12);
-					maskY |= 1 << (cc1.wEdge[8 + i + 12] % 12);
-					maskY |= 1 << (cc1.mEdge[8 + i] >> 1);
-					maskZ |= 1 << (cc1.wEdge[4 + i] % 12);
-					maskZ |= 1 << (cc1.wEdge[4 + i + 12] % 12);
-					maskZ |= 1 << (cc1.mEdge[4 + i] >> 1);
+					maskY |= 1 << (sc.wEdge[8 + i] % 12);
+					maskY |= 1 << (sc.wEdge[8 + i + 12] % 12);
+					maskY |= 1 << (sc.mEdge[8 + i] >> 1);
+					maskZ |= 1 << (sc.wEdge[4 + i] % 12);
+					maskZ |= 1 << (sc.wEdge[4 + i + 12] % 12);
+					maskZ |= 1 << (sc.mEdge[4 + i] >> 1);
 				}
-				if (Integer.bitCount(maskY) > 8 && Integer.bitCount(maskZ) > 8) {
-					return 1;
+				if (Integer.bitCount(maskY) <= 8) {
+					p3sols.add(sc);
 				}
-				p3sols.add(copySolution(solution, length));
-				return 0;
+				if (Integer.bitCount(maskZ) <= 8) {
+					SolvingCube sc1 = new SolvingCube(sc);
+					sc1.doConj(1);
+					p3sols.add(sc1);
+				}
+				return p3sols.size() >= phase3SolsSize ? 0 : 1;
 			}
 		});
-		for (int[] sol : p3sols) {
-			cc.doMove(sol);
-			printSolution(sol, sollen += sol.length);
-			break;
+		System.out.println(String.format("Phase3 Finished in %d ms", (System.nanoTime() - startTime) / 1000000));
+		startTime = System.nanoTime();
+		for (SolvingCube sc : p3sols) {
+			sc.addCheckPoint();
+			// System.out.println(sc);
 		}
 
-		int conj = 0;
-		int maskY = 0;
-		int maskZ = 0;
-		for (int i = 0; i < 4; i++) {
-			maskY |= 1 << (cc.wEdge[8 + i] % 12);
-			maskY |= 1 << (cc.wEdge[8 + i + 12] % 12);
-			maskY |= 1 << (cc.mEdge[8 + i] >> 1);
-			maskZ |= 1 << (cc.wEdge[4 + i] % 12);
-			maskZ |= 1 << (cc.wEdge[4 + i + 12] % 12);
-			maskZ |= 1 << (cc.mEdge[4 + i] >> 1);
-		}
-		if (Integer.bitCount(maskY) > Integer.bitCount(maskZ)) {
-			System.out.println("Conj1");
-			cc.doConj(1);
-			conj = 1;
-		}
-
-		// System.out.println("Phase3 Solved");
-		// System.out.println(cc.toFacelet());
-		// System.out.println(cc);
-
-
-		Phase4Search p4search = new Phase4Search();
-		java.util.ArrayList<int[]> p4sols = new java.util.ArrayList<int[]>();
-		p4search.solve(new CubieCube[] {cc}, new SolutionChecker() {
+		ArrayList<SolvingCube> p4sols = new ArrayList<SolvingCube>();
+		p4search.solve(p3sols.toArray(new SolvingCube[0]), new SolutionChecker() {
+			@Override
 			int check(int[] solution, int length, int ccidx) {
-				p4sols.add(copySolution(solution, length));
-				return 0;
+				SolvingCube sc = new SolvingCube(p3sols.get(ccidx));
+				sc.doMove(copySolution(solution, length));
+				sc.doConj(1);
+				p4sols.add(sc);
+				return p4sols.size() >= phase4SolsSize ? 0 : 1;
 			}
 		});
-		for (int[] sol : p4sols) {
-			cc.doMove(sol);
-			printSolution(sol, sollen += sol.length);
-			break;
+		System.out.println(String.format("Phase4 Finished in %d ms", (System.nanoTime() - startTime) / 1000000));
+		startTime = System.nanoTime();
+		for (SolvingCube sc : p4sols) {
+			sc.addCheckPoint();
+			// System.out.println(sc);
 		}
 
-		// System.out.println(cc);
-
-		cc.doConj(1);
-		Phase5Search p5search = new Phase5Search();
-		java.util.ArrayList<int[]> p5sols = new java.util.ArrayList<int[]>();
-		p5search.solve(new CubieCube[] {cc}, new SolutionChecker() {
+		ArrayList<SolvingCube> p5sols = new ArrayList<SolvingCube>();
+		p5search.solve(p4sols.toArray(new SolvingCube[0]), new SolutionChecker() {
+			@Override
 			int check(int[] solution, int length, int ccidx) {
-				int[] solCopy = copySolution(solution, length);
-				for (int i = 0; i < solCopy.length; i++) {
-					solCopy[i] = CubieCube.SymMove[1][solCopy[i]];
-				}
-				p5sols.add(solCopy);
-				return 0;
+				SolvingCube sc = new SolvingCube(p4sols.get(ccidx));
+				sc.doMove(copySolution(solution, length));
+				p5sols.add(sc);
+				return p5sols.size() >= phase5SolsSize ? 0 : 1;
 			}
 		});
-		cc.doConj(3);
+		System.out.println(String.format("Phase5 Finished in %d ms", (System.nanoTime() - startTime) / 1000000));
+		startTime = System.nanoTime();
 
-		for (int[] sol : p5sols) {
-			cc.doMove(sol);
-			printSolution(sol, sollen += sol.length);
-			break;
+		for (SolvingCube sc : p5sols) {
+			sc.addCheckPoint();
+			System.out.println(sc);
+			System.out.println("Reduction: " + sc.length());
 		}
-		System.out.println(cc);
-		System.out.println("Reduction: " + sollen);
 	}
 
 	public static void solveTest() {
@@ -199,7 +192,17 @@ public class Search {
 
 		java.util.Random gen = new java.util.Random(42L);
 		for (int i = 0; i < 100; i++) {
-			CubieCube cc = Tools.randomCube(gen);
+			// CubieCube cc = Tools.randomCube(gen);
+
+			CubieCube cc = new CubieCube();
+			int[] scramble = new int[100];
+			for (int j = 0; j < 100; j++) {
+				scramble[j] = gen.nextInt(36);
+			}
+			System.out.print("Scramble: ");
+			printSolution(scramble);
+			cc.doMove(scramble);
+
 			solveSingle(cc);
 		}
 		// CubieCube cc = Tools.randomCube(gen);

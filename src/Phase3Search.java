@@ -15,6 +15,7 @@ class Phase3Search extends PhaseSearch {
 	static int NEXT_AXIS = 0x12492;
 
 	static int[][] CenterMove;
+	// static int[][] CenterConj;
 	static int[][] MEdgeMove;
 	static int[][] MEdgeConj;
 	static PruningTable CenterMEdgePrun;
@@ -88,19 +89,33 @@ class Phase3Search extends PhaseSearch {
 	}
 
 	static void initCenterMove() {
-		CenterMove = new int[1225][VALID_MOVES.length];
 		Phase3Center center = new Phase3Center();
+		CenterMove = new int[1225][VALID_MOVES.length];
+		// CenterConj = new int[1225][16];
 		for (int i = 0; i < 1225; i++) {
 			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setCenter(i);
 				center.doMove(m);
 				CenterMove[i][m] = center.getCenter();
 			}
+
+			// center.setCenter(i);
+			// for (int sym = 0; sym < 16; sym++) {
+			// 	CenterConj[i][CubieCube.SymMultInv[0][sym]] = center.getCenter();
+			// 	center.doConj(0);
+			// 	if ((sym & 3) == 3) {
+			// 		center.doConj(1);
+			// 	}
+			// 	if ((sym & 7) == 7) {
+			// 		center.doConj(2);
+			// 	}
+			// }
 		}
 	}
 
 	static PruningTable WEdgeSymPrun;
 	static PruningTable WMEdgeSymPrun;
+	static PruningTable CenterWEdgeSym;
 
 	static void initPrun() {
 		CenterMEdgePrun = new PruningTable(CenterMove, MEdgeMove, Phase3Center.SOLVED_CENTER, null, "Phase3CenterMEdge");
@@ -138,6 +153,32 @@ class Phase3Search extends PhaseSearch {
 				return MEdgeConj[idx][conj];
 			}
 		}, null, "Phase3MWEdgeSym");
+
+		// int[][] SolvedSymRaw = new int[108][2];
+		// for (int i = 0; i < 108; i++) {
+		// 	SolvedSymRaw[i][1] = Phase3Center.SOLVED_CENTER[i];
+		// }
+		// CenterWEdgeSym = new PruningTable(new SymCoord() {
+		// 	{
+		// 		N_IDX = 170971;
+		// 		N_MOVES = VALID_MOVES.length;
+		// 		N_SYM = 16;
+		// 		SelfSym = WEdgeSelfSym;
+		// 	}
+		// 	int getMoved(int move) {
+		// 		return WEdgeSymMove[idx][move];
+		// 	}
+		// }, new RawCoord() {
+		// 	{
+		// 		N_IDX = 1225;
+		// 	}
+		// 	int getMoved(int move) {
+		// 		return CenterMove[idx][move];
+		// 	}
+		// 	int getConj(int idx, int conj) {
+		// 		return CenterConj[idx][conj];
+		// 	}
+		// }, SolvedSymRaw, "Phase3CenterWEdgeSym");
 	}
 
 	static class Phase3Node extends Node {
@@ -145,11 +186,16 @@ class Phase3Search extends PhaseSearch {
 		int mEdge;
 		int wEdge;
 		int getPrun() {
-			return Math.max(CenterMEdgePrun.getPrun(center, mEdge),
-			                WMEdgeSymPrun.getPrun(wEdge >> 4, MEdgeConj[mEdge][wEdge & 0xf]));
+			return Math.max(
+			           CenterMEdgePrun.getPrun(center, mEdge),
+			           WMEdgeSymPrun.getPrun(wEdge >> 4, MEdgeConj[mEdge][wEdge & 0xf]));
+
+			// Math.max(
+			//     WMEdgeSymPrun.getPrun(wEdge >> 4, MEdgeConj[mEdge][wEdge & 0xf]),
+			//     CenterWEdgeSym.getPrun(wEdge >> 4, CenterConj[center][wEdge & 0xf])));
 		}
-		boolean isSolved(int maxl) {
-			return maxl == 0 && mEdge == 0 && (wEdge >> 4) == 0;
+		boolean isSolved() {
+			return mEdge == 0 && (wEdge >> 4) == 0;
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase3Node node = (Phase3Node) node0;
@@ -179,26 +225,29 @@ class Phase3Search extends PhaseSearch {
 			ct.tCenter[i] = cc.tCenter[16 + (i & 4) + (i + 1) % 4] == 1 ? 0 : -1;
 		}
 		int center = ct.getCenter();
-		Node[] nodes = new Node[2048];
-		for (int idx = 0; idx < 2048; idx++) {
-			int flip = idx << 1 | (Integer.bitCount(idx) & 1);
-			for (int i = 0; i < 24; i++) {
-				ed.wEdge[i] = cc.wEdge[i] < 12 ? 0 : -1;
-				if ((flip >> (cc.wEdge[i] % 12) & 1) != 0) {
-					ed.wEdge[i] = -1 - ed.wEdge[i];
+		java.util.ArrayList<Node> nodes = new java.util.ArrayList<Node>();
+		for (int filter = 8; nodes.size() == 0; filter++) {
+			for (int idx = 0; idx < 2048; idx++) {
+				Phase3Node node = new Phase3Node();
+				int flip = idx << 1 | (Integer.bitCount(idx) & 1);
+				flip = (flip ^ 0xfff) << 12 | flip;
+				for (int i = 0; i < 12; i++) {
+					ed.mEdge[i] = cc.mEdge[i] & 1;
+					ed.mEdge[i] ^= flip >> (cc.mEdge[i] >> 1) & 1;
 				}
+				for (int i = 0; i < 24; i++) {
+					ed.wEdge[i] = (flip >> cc.wEdge[i] & 1) == 0 ? 0 : -1;
+				}
+				node.mEdge = ed.getMEdge();
+				node.wEdge = WEdgeRaw2Sym[ed.getWEdge()];
+				node.center = center;
+				if (node.getPrun() > filter) {
+					continue;
+				}
+				nodes.add(node);
 			}
-			for (int i = 0; i < 12; i++) {
-				ed.mEdge[i] = cc.mEdge[i] & 1;
-				ed.mEdge[i] ^= flip >> (cc.mEdge[i] >> 1) & 1;
-			}
-			Phase3Node node = new Phase3Node();
-			node.mEdge = ed.getMEdge();
-			node.wEdge = WEdgeRaw2Sym[ed.getWEdge()];
-			node.center = center;
-			nodes[idx] = node;
 		}
-		return nodes;
+		return nodes.toArray(new Node[0]);
 	}
 
 	public static void main(String[] args) {

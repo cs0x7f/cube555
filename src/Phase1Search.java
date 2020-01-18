@@ -55,7 +55,7 @@ class Phase1Search extends PhaseSearch {
 		int getPrun() {
 			return Math.max(TCenterPrun.getPrun(tCenter), XCenterPrun.getPrun(xCenter));
 		}
-		boolean isSolved(int maxl) {
+		boolean isSolved() {
 			return tCenter == 0 && xCenter == 0;
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
@@ -68,6 +68,7 @@ class Phase1Search extends PhaseSearch {
 
 	Phase1Search() {
 		super.VALID_MOVES = VALID_MOVES;
+		super.MIN_BACK_DEPTH = 5;
 		for (int i = 0; i < searchNode.length; i++) {
 			searchNode[i] = new Phase1Node();
 		}

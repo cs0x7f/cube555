@@ -197,8 +197,8 @@ class Phase4Search extends PhaseSearch {
 			prun = Math.max(prun, MLEdgeUDCenterPrun.getPrun((lEdge * 70 + mEdge) * 4900 + udCenter));
 			return Math.max(prun, MHEdgeUDCenterPrun.getPrun((hEdge * 70 + mEdge) * 4900 + udCenter));
 		}
-		boolean isSolved(int maxl) {
-			return maxl == 0 && mEdge == 0 && lEdge == 0 && hEdge == 0;
+		boolean isSolved() {
+			return mEdge == 0 && lEdge == 0 && hEdge == 0;
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase4Node node = (Phase4Node) node0;
@@ -259,7 +259,7 @@ class Phase4Search extends PhaseSearch {
 		int bitCnt = Integer.bitCount(maskY);
 
 		Node[] nodes = new Node[Cnk[bitCnt][4]];
-		System.out.println(nodes.length);
+		// System.out.println(nodes.length);
 		int idx = 0;
 		for (int mask = maskY; mask != 0; mask = mask - 1 & maskY) {
 			if (Integer.bitCount(mask) != 4) {

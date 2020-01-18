@@ -4,17 +4,10 @@ import static cs.cube555.Util.*;
 import static cs.cube555.Phase3Search.VALID_MOVES;
 
 /*
-				0	0	1
-				3		1
-				3	2	2
 
 7	7	4						3	3	0
 6		4						2		0
 6	5	5						2	1	1
-
-				4	4	5
-				7		5
-				7	6	6
 */
 
 class Phase3Center {
@@ -104,6 +97,35 @@ class Phase3Center {
 			swap(xCenter, 0, 6);
 			swap(xCenter, 1, 7);
 		case Bx2:
+			break;
+		}
+	}
+
+	void doConj(int conj) {
+		switch (conj) {
+		case 0: //x
+			doMove(Rx1);
+			doMove(Lx3);
+			break;
+		case 1: //y2
+			swap(tCenter, 0, 4);
+			swap(tCenter, 1, 5);
+			swap(tCenter, 2, 6);
+			swap(tCenter, 3, 7);
+			swap(xCenter, 0, 4);
+			swap(xCenter, 1, 5);
+			swap(xCenter, 2, 6);
+			swap(xCenter, 3, 7);
+			break;
+		case 2: //lr2
+			swap(tCenter, 0, 6);
+			swap(tCenter, 1, 5);
+			swap(tCenter, 2, 4);
+			swap(tCenter, 3, 7);
+			swap(xCenter, 0, 7);
+			swap(xCenter, 1, 6);
+			swap(xCenter, 2, 5);
+			swap(xCenter, 3, 4);
 			break;
 		}
 	}

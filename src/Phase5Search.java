@@ -57,7 +57,6 @@ class Phase5Search extends PhaseSearch {
 
 	static int[][] UDCenterMove;
 	static int[][] CenterMove;
-	// static byte[] CenterPrun;
 	static PruningTable CenterPrun;
 
 	static void initCenterMove() {
@@ -121,7 +120,7 @@ class Phase5Search extends PhaseSearch {
 			                    HEdgeCenterPrun.getPrun(hEdge, center % 4900))
 			       );
 		}
-		boolean isSolved(int maxl) {
+		boolean isSolved() {
 			return lEdge == 0 && hEdge == 0 && center == 0;
 		}
 		int doMovePrun(Node node0, int move, int maxl) {

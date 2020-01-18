@@ -49,7 +49,7 @@ class Phase2Search extends PhaseSearch {
 			return Math.max(prunTCenter.getPrun(tCenter, eParity),
 			                prunXCenter.getPrun(xCenter, eParity));
 		}
-		boolean isSolved(int maxl) {
+		boolean isSolved() {
 			return tCenter == 0 && xCenter == 0 && eParity == 0;
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
@@ -63,6 +63,7 @@ class Phase2Search extends PhaseSearch {
 
 	Phase2Search() {
 		super.VALID_MOVES = VALID_MOVES;
+		super.MIN_BACK_DEPTH = 5;
 		for (int i = 0; i < searchNode.length; i++) {
 			searchNode[i] = new Phase2Node();
 		}

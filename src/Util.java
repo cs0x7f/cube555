@@ -223,8 +223,20 @@ class Util {
 			for (int move = 0; move < VALID_MOVES.length; move++) {
 				int axis = VALID_MOVES[move] / 3;
 				if (axis == la || axis % 3 == la % 3 && axis >= la) {
-					ret[last] |= 1L << move;
+					ret[last] |= 1 << move;
 				}
+			}
+		}
+		return ret;
+	}
+
+	static long genNextAxis(int[] VALID_MOVES) {
+		long ret = 0;
+		for (int i = 0; i < VALID_MOVES.length; i++) {
+			if (VALID_MOVES[i] % 3 == 0) {
+				//if Mx1 makes state farther, Mx2 and Mx3 should be skipped
+				// (next_axis >> i & 3) == 2 for Mx1, 1 for Mx2, 0 for Mx3
+				ret |= 1L << (i + 1);
 			}
 		}
 		return ret;
