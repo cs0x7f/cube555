@@ -4,18 +4,18 @@ import static cs.cube555.Util.*;
 import static cs.cube555.Phase4Search.VALID_MOVES;
 
 /*
- 					13	1
-				4			17
-				16			5
-					0	12
-	4	16			0	12			5	17			1	13
-9			20	20			11	11			22	22			9
-21			8	8			23	23			10	10			21
-	19	7			15	3			18	6			14	2
-					15	3
-				7			18
-				19			6
-					2	14
+	13	1
+4			17
+16			5
+	0	12
+	0	12
+*			*
+*			*
+	15	3
+	15	3
+7			18
+19			6
+	2	14
  */
 
 class Phase4Edge {
@@ -169,6 +169,47 @@ class Phase4Edge {
 			swap(mEdge, 1, 2);
 			swap(lEdge, 1, 2);
 			swap(hEdge, 1, 2);
+			break;
+		}
+	}
+
+	void doConj(int conj) {
+		isStd = false;
+		switch (conj) {
+		case 0: //x2
+			swap(mEdge, 0, 2);
+			swap(lEdge, 0, 2);
+			swap(hEdge, 0, 2);
+			swap(mEdge, 1, 3);
+			swap(lEdge, 1, 3);
+			swap(hEdge, 1, 3);
+			swap(mEdge, 4, 7);
+			swap(hEdge, 4, 7);
+			swap(lEdge, 4, 7);
+			swap(mEdge, 5, 6);
+			swap(hEdge, 5, 6);
+			swap(lEdge, 5, 6);
+			break;
+		case 1: //y2
+			swap(mEdge, 0, 4, 1, 5, 1);
+			swap(mEdge, 2, 7, 3, 6, 1);
+			swap(lEdge, 0, 4, 1, 5, 1);
+			swap(lEdge, 2, 7, 3, 6, 1);
+			swap(hEdge, 0, 4, 1, 5, 1);
+			swap(hEdge, 2, 7, 3, 6, 1);
+			break;
+		case 2: //lr mirror
+			for (int i = 0; i < 8; i++) {
+				int tmp = lEdge[i];
+				lEdge[i] = hEdge[i];
+				hEdge[i] = tmp;
+			}
+			swap(mEdge, 4, 5);
+			swap(lEdge, 4, 5);
+			swap(hEdge, 4, 5);
+			swap(mEdge, 6, 7);
+			swap(lEdge, 6, 7);
+			swap(hEdge, 6, 7);
 			break;
 		}
 	}

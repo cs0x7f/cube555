@@ -162,27 +162,24 @@ public class Search {
 			Tools.SaveToFile("Phase1XCenterMove.jdata", Phase1Search.XCenterMove);
 		}
 		Phase1Search.initCenterPrun();
+
 		Phase2Search.initCenterMove();
 		Phase2Search.initCenterPrun();
-
 
 		Phase3Search.initWEdgeSymMove();
 		Phase3Search.initMEdgeMove();
 		Phase3Search.initCenterMove();
 		Phase3Search.initPrun();
 
-
 		Phase4Search.initCenterMove();
 		Phase4Search.initEdgeMove();
-		Phase4Search.initCenterPrun();
-		Phase4Search.initEdgePrun();
-
+		Phase4Search.initMLEdgeSymMove();
+		Phase4Search.initPrun();
 
 		Phase5Search.initCenterMove();
 		Phase5Search.initEdgeMove();
-		Phase5Search.initCenterPrun();
+		Phase5Search.initPrun();
 		// Phase5Search.initEdgePrun();
-		Phase5Search.initEdgeCenterPrun();
 
 		// if (true) {
 		// 	CubieCube cc = new CubieCube();
@@ -192,16 +189,16 @@ public class Search {
 
 		java.util.Random gen = new java.util.Random(42L);
 		for (int i = 0; i < 100; i++) {
-			// CubieCube cc = Tools.randomCube(gen);
+			CubieCube cc = Tools.randomCube(gen);
 
-			CubieCube cc = new CubieCube();
-			int[] scramble = new int[100];
-			for (int j = 0; j < 100; j++) {
-				scramble[j] = gen.nextInt(36);
-			}
-			System.out.print("Scramble: ");
-			printSolution(scramble);
-			cc.doMove(scramble);
+			// CubieCube cc = new CubieCube();
+			// int[] scramble = new int[100];
+			// for (int j = 0; j < 100; j++) {
+			// 	scramble[j] = gen.nextInt(36);
+			// }
+			// System.out.print("Scramble: ");
+			// printSolution(scramble);
+			// cc.doMove(scramble);
 
 			solveSingle(cc);
 		}

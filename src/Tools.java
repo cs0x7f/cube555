@@ -17,7 +17,7 @@ class Tools {
 			oos.writeObject(obj);
 			oos.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e);
 			return false;
 		}
 		return true;
@@ -30,7 +30,7 @@ class Tools {
 			ret = oos.readObject();
 			oos.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e);
 			return null;
 		}
 		return ret;

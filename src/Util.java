@@ -448,15 +448,38 @@ class Util {
 		}
 	}
 
-	static int[][] createMoveTable(Coord coord) {
-		int[][] moveTable = new int[coord.N_IDX][coord.N_MOVES];
-		for (int i = 0; i < coord.N_IDX; i++) {
-			coord.set(i);
-			for (int m = 0; m < coord.N_MOVES; m++) {
-				moveTable[i][m] = coord.getMoved(m);
+	static class TableRawCoord extends RawCoord {
+		int[][] moveTable;
+		int[][] conjTable;
+		TableRawCoord(int[][] moveTable, int[][] conjTable) {
+			this.moveTable = moveTable;
+			this.conjTable = conjTable;
+			this.N_IDX = moveTable.length;
+			this.N_MOVES = moveTable[0].length;
+		}
+		int getMoved(int move) {
+			return moveTable[idx][move];
+		}
+		int getConj(int idx, int conj) {
+			return conjTable[idx][conj];
+		}
+	}
+
+	static int[][] packSolved(int[] Solved1, int[] Solved2) {
+		if (Solved1 == null) {
+			Solved1 = new int[] {0};
+		}
+		if (Solved2 == null) {
+			Solved2 = new int[] {0};
+		}
+		int[][] Solved = new int[Solved1.length * Solved2.length][];
+		int idx = 0;
+		for (int idx1 : Solved1) {
+			for (int idx2 : Solved2) {
+				Solved[idx++] = new int[] {idx1, idx2};
 			}
 		}
-		return moveTable;
+		return Solved;
 	}
 
 	static class PruningTable {
@@ -496,15 +519,7 @@ class Util {
 		}
 
 		PruningTable(int[][] Move, int[] Solved, String filename) {
-			initPrunTable(new Coord() {
-				{
-					N_IDX = Move.length;
-					N_MOVES = Move[0].length;
-				}
-				int getMoved(int move) {
-					return Move[idx][move];
-				}
-			}, Solved, filename);
+			initPrunTable(new TableRawCoord(Move, null), Solved, filename);
 		}
 
 		PruningTable(int[][] Move1, int[][] Move2, int[] Solved1, int[] Solved2, String filename) {
@@ -564,10 +579,13 @@ class Util {
 				done++;
 				realDone += N_SYM / Integer.bitCount(symCoord.SelfSym[val[0]]);
 			}
-			long startTime = System.nanoTime();
 			int cumDone = done;
+			long cumRealDone = cumDone;
+			long startTime = System.nanoTime();
 			do {
-				System.out.println(String.format("%s:%2d%,14d%,16d%10dms", filename, depth, done, realDone, (System.nanoTime() - startTime) / 1000000));
+				System.out.println(String.format("%s:%2d%,14d%,14d%,16d%,16d%10dms", filename,
+				                                 depth, done, cumDone, realDone, cumRealDone,
+				                                 (System.nanoTime() - startTime) / 1000000));
 				done = 0;
 				realDone = 0;
 				boolean inv = cumDone > N_STATE / 2;
@@ -621,6 +639,7 @@ class Util {
 					}
 				}
 				cumDone += done;
+				cumRealDone += realDone;
 			} while (done > 0 && depth <= 15);
 			Tools.SaveToFile(filename + "Prun.jhdata", Prun);
 		}
@@ -647,7 +666,9 @@ class Util {
 			long startTime = System.nanoTime();
 			int cumDone = done;
 			do {
-				System.out.println(String.format("%s:%2d%,14d%10dms", filename, depth, done, (System.nanoTime() - startTime) / 1000000));
+				System.out.println(String.format("%s:%2d%,14d%,14d%10dms", filename,
+				                                 depth, done, cumDone,
+				                                 (System.nanoTime() - startTime) / 1000000));
 				done = 0;
 				boolean inv = cumDone > N_STATE / 2;
 				int select = inv ? 0xf : depth;

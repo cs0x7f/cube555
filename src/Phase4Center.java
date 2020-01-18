@@ -133,4 +133,78 @@ class Phase4Center {
 			break;
 		}
 	}
+
+	/*
+					0	0	1
+					3		1
+					3	2	2
+
+	7	7	4						3	3	0
+	6		4						2		0
+	6	5	5						2	1	1
+
+					4	4	5
+					7		5
+					7	6	6
+	*/
+	void doConj(int conj) {
+		switch (conj) {
+		case 0: //x2
+			swap(udtCenter, 0, 4);
+			swap(udtCenter, 1, 5);
+			swap(udtCenter, 2, 6);
+			swap(udtCenter, 3, 7);
+			swap(udxCenter, 0, 4);
+			swap(udxCenter, 1, 5);
+			swap(udxCenter, 2, 6);
+			swap(udxCenter, 3, 7);
+			swap(rltCenter, 0, 1, 2, 3, 1);
+			swap(rltCenter, 4, 5, 6, 7, 1);
+			swap(rlxCenter, 0, 1, 2, 3, 1);
+			swap(rlxCenter, 4, 5, 6, 7, 1);
+			for (int i = 0; i < 8; i++) {
+				udtCenter[i] = -1 - udtCenter[i];
+				udxCenter[i] = -1 - udxCenter[i];
+			}
+			break;
+		case 1: //y2
+			swap(rltCenter, 0, 4);
+			swap(rltCenter, 1, 5);
+			swap(rltCenter, 2, 6);
+			swap(rltCenter, 3, 7);
+			swap(rlxCenter, 0, 4);
+			swap(rlxCenter, 1, 5);
+			swap(rlxCenter, 2, 6);
+			swap(rlxCenter, 3, 7);
+			swap(udtCenter, 0, 1, 2, 3, 1);
+			swap(udxCenter, 0, 1, 2, 3, 1);
+			swap(udtCenter, 4, 5, 6, 7, 1);
+			swap(udxCenter, 4, 5, 6, 7, 1);
+			for (int i = 0; i < 8; i++) {
+				rltCenter[i] = -1 - rltCenter[i];
+				rlxCenter[i] = -1 - rlxCenter[i];
+			}
+			break;
+		case 2: //lr mirror
+			swap(udtCenter, 1, 3);
+			swap(udtCenter, 5, 7);
+			swap(udxCenter, 0, 1);
+			swap(udxCenter, 2, 3);
+			swap(udxCenter, 4, 5);
+			swap(udxCenter, 6, 7);
+			swap(rltCenter, 0, 6);
+			swap(rltCenter, 1, 5);
+			swap(rltCenter, 2, 4);
+			swap(rltCenter, 3, 7);
+			swap(rlxCenter, 0, 7);
+			swap(rlxCenter, 1, 6);
+			swap(rlxCenter, 2, 5);
+			swap(rlxCenter, 3, 4);
+			for (int i = 0; i < 8; i++) {
+				rltCenter[i] = -1 - rltCenter[i];
+				rlxCenter[i] = -1 - rlxCenter[i];
+			}
+			break;
+		}
+	}
 }

@@ -13,6 +13,22 @@ class Phase4Search extends PhaseSearch {
 	static int[][] MEdgeMove = new int[70][VALID_MOVES.length];
 	static int[][] HEdgeMove = new int[70 * 1680][VALID_MOVES.length];
 	static int[][] LEdgeMove = new int[70 * 1680][VALID_MOVES.length];
+	static int[][] HEdgeConj = new int[70 * 1680][4];
+	static int[] RLCenter2Half;
+	static int[] Half2RLCenter;
+	static int[][] UDCenterMove;
+	static int[][] UDCenterConj;
+	static int[][] RLCenterMove;
+	static int[][] RLCenterConj;
+	static int[][] MLEdgeSymMove;
+	static int[] MLEdgeSym2RawF;
+	static int[] MLEdgeSelfSym;
+	static int[] MLEdgeRaw2Sym;
+	static int[] MLEdgeMirror;
+	static PruningTable EdgePrunSym;
+	static PruningTable CenterPrun;
+	static PruningTable MLEdgeSymUDCenterPrun;
+	static PruningTable MLEdgeSymRLCenterPrun;
 
 	static void initEdgeMove() {
 		Phase4Edge edge = new Phase4Edge();
@@ -27,39 +43,101 @@ class Phase4Search extends PhaseSearch {
 					HEdgeMove[mEdge * 1680 + i][m] = edge.getHEdge();
 					LEdgeMove[mEdge * 1680 + i][m] = edge.getLEdge();
 				}
+
+				edge.setMEdge(mEdge);
+				edge.setHEdge(i);
+				for (int sym = 0; sym < 4; sym++) {
+					HEdgeConj[mEdge * 1680 + i][sym] = edge.getHEdge();
+					edge.doConj(0);
+					if ((sym & 1) == 1) {
+						edge.doConj(1);
+					}
+				}
 			}
 		}
 	}
 
-	static PruningTable EdgePrun;
+	static void initMLEdgeSymMove() {
+		Phase4Edge edge = new Phase4Edge();
 
-	static void initEdgePrun() {
-		EdgePrun = new PruningTable(new Coord() {
-			{
-				N_IDX = 70 * 1680 * 1680;
-				N_MOVES = VALID_MOVES.length;
+		MLEdgeMirror = new int[70 * 1680];
+		for (int i = 0; i < MLEdgeMirror.length; i++) {
+			edge.setMEdge(i % 70);
+			edge.setLEdge(i / 70);
+			edge.doConj(2);
+			MLEdgeMirror[i] = edge.getHEdge() * 70 + edge.getMEdge();
+		}
+
+		int symCnt = 0;
+		MLEdgeSym2RawF = new int[29616 * 4];
+		MLEdgeSelfSym = new int[29616];
+		MLEdgeRaw2Sym = new int[70 * 1680];
+		for (int i = 0; i < MLEdgeRaw2Sym.length; i++) {
+			if (MLEdgeRaw2Sym[i] != 0) {
+				continue;
 			}
-			int mEdge = 0;
-			int lEdge = 0;
-			int hEdge = 0;
-			void set(int i) {
-				mEdge = i % 70;
-				lEdge = i / 70 % 1680;
-				hEdge = i / 70 / 1680;
+			edge.setMEdge(i % 70);
+			edge.setLEdge(i / 70);
+			for (int sym = 0; sym < 4; sym++) {
+				int idx = edge.getLEdge() * 70 + edge.getMEdge();
+				MLEdgeRaw2Sym[idx] = symCnt << 2 | sym;
+				MLEdgeSym2RawF[symCnt << 2 | sym] = idx;
+				if (idx == i) {
+					MLEdgeSelfSym[symCnt] |= 1 << sym;
+				}
+				edge.doConj(0);
+				if ((sym & 1) == 1) {
+					edge.doConj(1);
+				}
+			}
+			symCnt++;
+		}
+		MLEdgeSymMove = new int[symCnt][VALID_MOVES.length];
+		for (int i = 0; i < symCnt; i++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
+				edge.setMEdge(MLEdgeSym2RawF[i << 2] % 70);
+				edge.setLEdge(MLEdgeSym2RawF[i << 2] / 70);
+				edge.doMove(m);
+				MLEdgeSymMove[i][m] = MLEdgeRaw2Sym[edge.getLEdge() * 70 + edge.getMEdge()];
+			}
+		}
+
+		int[] mEdge = new int[2];
+		EdgePrunSym = new PruningTable(new SymCoord() {
+			{
+				N_IDX = 29616;
+				N_MOVES = VALID_MOVES.length;
+				N_SYM = 4;
+				SelfSym = MLEdgeSelfSym;
+			}
+			@Override
+			void set(int idx) {
+				this.idx = idx;
+				mEdge[0] = MLEdgeSym2RawF[idx << 2] % 70;
 			}
 			int getMoved(int move) {
-				return (HEdgeMove[mEdge * 1680 + hEdge][move] * 1680 + LEdgeMove[mEdge * 1680 + lEdge][move]) * 70 + MEdgeMove[mEdge][move];
+				mEdge[1] = MLEdgeSym2RawF[MLEdgeSymMove[idx][move]] % 70;
+				return MLEdgeSymMove[idx][move];
 			}
-		}, null, "Phase4Edge");
+		}, new RawCoord() {
+			{
+				N_IDX = 1680;
+			}
+			@Override
+			int getMoved(int move) {
+				return Phase4Search.HEdgeMove[mEdge[0] * 1680 + idx][move];
+			}
+			@Override
+			int getConj(int idx, int conj) {
+				return Phase4Search.HEdgeConj[mEdge[1] * 1680 + idx][conj];
+			}
+		}, null, "Phase4EdgeSym");
 	}
-
-	static int[] RLCenter2Half = new int[2450];
-	static int[] Half2RLCenter = new int[216];
-	static int[][] UDCenterMove = new int[4900][VALID_MOVES.length];
-	static int[][] RLCenterMove = new int[216][VALID_MOVES.length];
 
 	static void initCenterMove() {
 		Phase4Center center = new Phase4Center();
+		RLCenter2Half = new int[2450];
+		Half2RLCenter = new int[216];
 		for (int i = 0; i < RLCenter2Half.length; i++) {
 			RLCenter2Half[i] = -1;
 		}
@@ -82,106 +160,71 @@ class Phase4Search extends PhaseSearch {
 				}
 			}
 		}
-		for (int m = 0; m < VALID_MOVES.length; m++) {
-			for (int i = 0; i < 4900; i++) {
+		UDCenterMove = new int[4900][VALID_MOVES.length];
+		RLCenterMove = new int[216][VALID_MOVES.length];
+		UDCenterConj = new int[4900][8];
+		RLCenterConj = new int[216][8];
+		for (int i = 0; i < 4900; i++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setUDCenter(i);
 				center.doMove(m);
 				UDCenterMove[i][m] = center.getUDCenter();
 			}
-			for (int i = 0; i < 216; i++) {
+			center.setUDCenter(i);
+			for (int sym = 0; sym < 8; sym++) {
+				UDCenterConj[i][sym] = center.getUDCenter();
+				center.doConj(0);
+				if ((sym & 1) == 1) {
+					center.doConj(1);
+				}
+				if ((sym & 3) == 3) {
+					center.doConj(2);
+				}
+			}
+		}
+		for (int i = 0; i < 216; i++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setRLCenter(Half2RLCenter[i]);
 				center.doMove(m);
 				RLCenterMove[i][m] = RLCenter2Half[center.getRLCenter()];
 			}
+			center.setRLCenter(Half2RLCenter[i]);
+			for (int sym = 0; sym < 8; sym++) {
+				RLCenterConj[i][sym] = RLCenter2Half[center.getRLCenter()];
+				center.doConj(0);
+				if ((sym & 1) == 1) {
+					center.doConj(1);
+				}
+				if ((sym & 3) == 3) {
+					center.doConj(2);
+				}
+			}
 		}
 	}
 
-	static PruningTable CenterPrun;
-
-	static void initCenterPrun() {
+	static void initPrun() {
 		int[] UDSOLVED = new int[] {0, 1895, 1967, 2905, 2977, 4876};
 		int[] RLSOLVED = new int[UDSOLVED.length / 2];
 		for (int i = 0; i < UDSOLVED.length / 2; i++) {
 			RLSOLVED[i] = RLCenter2Half[UDSOLVED[i]];
 		}
+
+		SymCoord MLEdgeSymCoord = new SymCoord() {
+			{
+				N_IDX = 29616;
+				N_MOVES = VALID_MOVES.length;
+				N_SYM = 4;
+				SelfSym = MLEdgeSelfSym;
+			}
+			int getMoved(int move) {
+				return MLEdgeSymMove[idx][move];
+			}
+		};
+
 		CenterPrun = new PruningTable(RLCenterMove, UDCenterMove, RLSOLVED, UDSOLVED, "Phase4Center");
-		MLEdgeRLCenterPrun = new PruningTable(new Coord() {
-			{
-				N_IDX = 70 * 1680 * 216;
-				N_MOVES = VALID_MOVES.length;
-			}
-			int rlCenter = 0;
-			int mEdge = 0;
-			int lEdge = 0;
-			void set(int i) {
-				rlCenter = i % 216;
-				mEdge = i / 216 % 70;
-				lEdge = i / 216 / 70;
-			}
-			int getMoved(int move) {
-				return (LEdgeMove[mEdge * 1680 + lEdge][move] * 70 + MEdgeMove[mEdge][move]) * 216 + RLCenterMove[rlCenter][move];
-			}
-		}, RLSOLVED, "MLEdgeRLCenter");
-		MHEdgeRLCenterPrun = new PruningTable(new Coord() {
-			{
-				N_IDX = 70 * 1680 * 216;
-				N_MOVES = VALID_MOVES.length;
-			}
-			int rlCenter = 0;
-			int mEdge = 0;
-			int hEdge = 0;
-			void set(int i) {
-				rlCenter = i % 216;
-				mEdge = i / 216 % 70;
-				hEdge = i / 216 / 70;
-			}
-			int getMoved(int move) {
-				return (HEdgeMove[mEdge * 1680 + hEdge][move] * 70 + MEdgeMove[mEdge][move]) * 216 + RLCenterMove[rlCenter][move];
-			}
-		}, RLSOLVED, "MHEdgeRLCenter");
-
-		MHEdgeUDCenterPrun = new PruningTable(new Coord() {
-			{
-				N_IDX = 70 * 1680 * 4900;
-				N_MOVES = VALID_MOVES.length;
-			}
-			int udCenter = 0;
-			int mEdge = 0;
-			int hEdge = 0;
-			void set(int i) {
-				udCenter = i % 4900;
-				mEdge = i / 4900 % 70;
-				hEdge = i / 4900 / 70;
-			}
-			int getMoved(int move) {
-				return (HEdgeMove[mEdge * 1680 + hEdge][move] * 70 + MEdgeMove[mEdge][move]) * 4900 + UDCenterMove[udCenter][move];
-			}
-		}, UDSOLVED, "MHEdgeUDCenter");
-
-		MLEdgeUDCenterPrun = new PruningTable(new Coord() {
-			{
-				N_IDX = 70 * 1680 * 4900;
-				N_MOVES = VALID_MOVES.length;
-			}
-			int udCenter = 0;
-			int mEdge = 0;
-			int lEdge = 0;
-			void set(int i) {
-				udCenter = i % 4900;
-				mEdge = i / 4900 % 70;
-				lEdge = i / 4900 / 70;
-			}
-			int getMoved(int move) {
-				return (LEdgeMove[mEdge * 1680 + lEdge][move] * 70 + MEdgeMove[mEdge][move]) * 4900 + UDCenterMove[udCenter][move];
-			}
-		}, UDSOLVED, "MLEdgeUDCenter");
-
+		MLEdgeSymUDCenterPrun = new PruningTable(MLEdgeSymCoord, new TableRawCoord(UDCenterMove, UDCenterConj), packSolved(null, UDSOLVED), "Phase4MLEdgeSymUDCenter");
+		MLEdgeSymRLCenterPrun = new PruningTable(MLEdgeSymCoord, new TableRawCoord(RLCenterMove, RLCenterConj), packSolved(null, RLSOLVED), "Phase4MLEdgeSymRLCenter");
 	}
-
-	static PruningTable MLEdgeRLCenterPrun;
-	static PruningTable MHEdgeRLCenterPrun;
-	static PruningTable MLEdgeUDCenterPrun;
-	static PruningTable MHEdgeUDCenterPrun;
 
 	static class Phase4Node extends Node {
 		int rlCenter;
@@ -190,12 +233,19 @@ class Phase4Search extends PhaseSearch {
 		int lEdge;
 		int hEdge;
 		int getPrun() {
+			int mlEdges = MLEdgeRaw2Sym[lEdge * 70 + mEdge];
+			int mhEdges = MLEdgeRaw2Sym[MLEdgeMirror[hEdge * 70 + mEdge]];
 			int prun = CenterPrun.getPrun(rlCenter, udCenter);
-			prun = Math.max(prun, EdgePrun.getPrun((hEdge * 1680 + lEdge) * 70 + mEdge));
-			prun = Math.max(prun, MLEdgeRLCenterPrun.getPrun((lEdge * 70 + mEdge) * 216 + rlCenter));
-			prun = Math.max(prun, MHEdgeRLCenterPrun.getPrun((hEdge * 70 + mEdge) * 216 + rlCenter));
-			prun = Math.max(prun, MLEdgeUDCenterPrun.getPrun((lEdge * 70 + mEdge) * 4900 + udCenter));
-			return Math.max(prun, MHEdgeUDCenterPrun.getPrun((hEdge * 70 + mEdge) * 4900 + udCenter));
+			prun = Math.max(prun,
+			                EdgePrunSym.getPrun(mlEdges >> 2, HEdgeConj[mEdge * 1680 + hEdge][mlEdges & 0x3]));
+			prun = Math.max(prun,
+			                MLEdgeSymRLCenterPrun.getPrun(mlEdges >> 2, RLCenterConj[rlCenter][mlEdges & 3]));
+			prun = Math.max(prun,
+			                MLEdgeSymRLCenterPrun.getPrun(mhEdges >> 2, RLCenterConj[rlCenter][mhEdges & 3 | 4]));
+			prun = Math.max(prun,
+			                MLEdgeSymUDCenterPrun.getPrun(mlEdges >> 2, UDCenterConj[udCenter][mlEdges & 3]));
+			return Math.max(prun,
+			                MLEdgeSymUDCenterPrun.getPrun(mhEdges >> 2, UDCenterConj[udCenter][mhEdges & 3 | 4]));
 		}
 		boolean isSolved() {
 			return mEdge == 0 && lEdge == 0 && hEdge == 0;
@@ -207,25 +257,23 @@ class Phase4Search extends PhaseSearch {
 			mEdge = MEdgeMove[node.mEdge][move];
 			lEdge = LEdgeMove[node.mEdge * 1680 + node.lEdge][move];
 			hEdge = HEdgeMove[node.mEdge * 1680 + node.hEdge][move];
-			if (maxl <= MLEdgeUDCenterPrun.getPrun((lEdge * 70 + mEdge) * 4900 + udCenter)) {
+			int mlEdges = MLEdgeRaw2Sym[lEdge * 70 + mEdge];
+			int mhEdges = MLEdgeRaw2Sym[MLEdgeMirror[hEdge * 70 + mEdge]];
+
+			if (maxl <= EdgePrunSym.getPrun(mlEdges >> 2, HEdgeConj[mEdge * 1680 + hEdge][mlEdges & 0x3])) {
+				return maxl;
+			} else if (maxl <= MLEdgeSymRLCenterPrun.getPrun(mlEdges >> 2, RLCenterConj[rlCenter][mlEdges & 3])) {
+				return maxl;
+			} else if (maxl <= MLEdgeSymRLCenterPrun.getPrun(mhEdges >> 2, RLCenterConj[rlCenter][mhEdges & 3 | 4])) {
+				return maxl;
+			} else if (maxl <= MLEdgeSymUDCenterPrun.getPrun(mlEdges >> 2, UDCenterConj[udCenter][mlEdges & 3])) {
+				return maxl;
+			} else if (maxl <= MLEdgeSymUDCenterPrun.getPrun(mhEdges >> 2, UDCenterConj[udCenter][mhEdges & 3 | 4])) {
+				return maxl;
+			} else if (maxl <= CenterPrun.getPrun(rlCenter, udCenter)) {
 				return maxl;
 			}
-			if (maxl <= MHEdgeUDCenterPrun.getPrun((hEdge * 70 + mEdge) * 4900 + udCenter)) {
-				return maxl;
-			}
-			if (maxl <= MLEdgeRLCenterPrun.getPrun((lEdge * 70 + mEdge) * 216 + rlCenter)) {
-				return maxl;
-			}
-			if (maxl <= MHEdgeRLCenterPrun.getPrun((hEdge * 70 + mEdge) * 216 + rlCenter)) {
-				return maxl;
-			}
-			if (maxl <= CenterPrun.getPrun(rlCenter, udCenter)) {
-				return maxl;
-			}
-			if (maxl <= EdgePrun.getPrun((hEdge * 1680 + lEdge) * 70 + mEdge)) {
-				return maxl;
-			}
-			return getPrun();
+			return maxl - 1;
 		}
 	}
 

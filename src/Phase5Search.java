@@ -15,11 +15,11 @@ class Phase5Search extends PhaseSearch {
 	static PruningTable EdgePrun;
 
 	static void initEdgeMove() {
-		HEdgeMove = new int[40320][14];
-		LEdgeMove = new int[40320][14];
+		HEdgeMove = new int[40320][VALID_MOVES.length];
+		LEdgeMove = new int[40320][VALID_MOVES.length];
 		Phase5Edge edge = new Phase5Edge();
 		for (int i = 0; i < 40320; i++) {
-			for (int m = 0; m < 14; m++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				edge.setLEdge(i);
 				edge.setHEdge(i);
 				edge.doMove(m);
@@ -60,13 +60,13 @@ class Phase5Search extends PhaseSearch {
 	static PruningTable CenterPrun;
 
 	static void initCenterMove() {
-		int[][] RFLBMove = new int[36][14];
-		int[][] TMove = new int[70][14];
-		int[][] XMove = new int[70][14];
-		CenterMove = new int[70 * 70 * 36][14];
+		int[][] RFLBMove = new int[36][VALID_MOVES.length];
+		int[][] TMove = new int[70][VALID_MOVES.length];
+		int[][] XMove = new int[70][VALID_MOVES.length];
+		CenterMove = new int[70 * 70 * 36][VALID_MOVES.length];
 		Phase5Center center = new Phase5Center();
 		for (int i = 0; i < 70; i++) {
-			for (int m = 0; m < 14; m++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setTCenter(i);
 				center.setXCenter(i);
 				center.doMove(m);
@@ -75,7 +75,7 @@ class Phase5Search extends PhaseSearch {
 			}
 		}
 		for (int i = 0; i < 36; i++) {
-			for (int m = 0; m < 14; m++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setRFLBCenter(i);
 				center.doMove(m);
 				RFLBMove[i][m] = center.getRFLBCenter();
@@ -85,26 +85,23 @@ class Phase5Search extends PhaseSearch {
 			int tCenter = i % 70;
 			int xCenter = i / 70 % 70;
 			int rflbCenter = i / 70 / 70;
-			for (int m = 0; m < 14; m++) {
+			for (int m = 0; m < VALID_MOVES.length; m++) {
 				CenterMove[i][m] = (RFLBMove[rflbCenter][m] * 70 + XMove[xCenter][m]) * 70 + TMove[tCenter][m];
 			}
 		}
 	}
 
-	static void initCenterPrun() {
-		CenterPrun = new PruningTable(CenterMove, null, "Phase5Center");
-	}
-
 	static PruningTable LEdgeCenterPrun;
 	static PruningTable HEdgeCenterPrun;
 
-	static void initEdgeCenterPrun() {
+	static void initPrun() {
 		int[][] UDCenterMove = new int[4900][VALID_MOVES.length];
 		for (int i = 0; i < 4900; i++) {
 			for (int j = 0; j < VALID_MOVES.length; j++) {
 				UDCenterMove[i][j] = CenterMove[i][j] % 4900;
 			}
 		}
+		CenterPrun = new PruningTable(CenterMove, null, "Phase5Center");
 		LEdgeCenterPrun = new PruningTable(LEdgeMove, UDCenterMove, null, null, "Phase5LEdgeCenter");
 		HEdgeCenterPrun = new PruningTable(HEdgeMove, UDCenterMove, null, null, "Phase5HEdgeCenter");
 	}

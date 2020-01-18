@@ -142,17 +142,7 @@ class Phase3Search extends PhaseSearch {
 			int getMoved(int move) {
 				return WEdgeSymMove[idx][move];
 			}
-		}, new RawCoord() {
-			{
-				N_IDX = 2048;
-			}
-			int getMoved(int move) {
-				return MEdgeMove[idx][move];
-			}
-			int getConj(int idx, int conj) {
-				return MEdgeConj[idx][conj];
-			}
-		}, null, "Phase3MWEdgeSym");
+		}, new TableRawCoord(MEdgeMove, MEdgeConj), null, "Phase3MWEdgeSym");
 
 		// int[][] SolvedSymRaw = new int[108][2];
 		// for (int i = 0; i < 108; i++) {
