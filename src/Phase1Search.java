@@ -113,12 +113,12 @@ class Phase1Search extends PhaseSearch {
 		}
 
 		TCenterSymPrun = new PruningTable(
-		    new TableSymCoord(TCenterSymMove, TCenterSelfSym, 16)
-		    , null, "Phase1TCenterSym");
+		    new TableSymCoord(TCenterSymMove, TCenterSelfSym, 16),
+		    null, "Phase1TCenterSym");
 
 		XCenterSymPrun = new PruningTable(
-		    new TableSymCoord(XCenterSymMove, XCenterSelfSym, 16)
-		    , null, "Phase1XCenterSym");
+		    new TableSymCoord(XCenterSymMove, XCenterSelfSym, 16),
+		    null, "Phase1XCenterSym");
 	}
 
 	static class Phase1Node extends Node {

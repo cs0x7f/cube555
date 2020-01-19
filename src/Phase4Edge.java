@@ -36,22 +36,6 @@ class Phase4Edge {
 		}
 	}
 
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < 8; i++) {
-			sb.append(mEdge[i]).append(' ');
-		}
-		sb.append('|');
-		for (int i = 0; i < 8; i++) {
-			sb.append(lEdge[i]).append(' ');
-		}
-		sb.append('|');
-		for (int i = 0; i < 8; i++) {
-			sb.append(hEdge[i]).append(' ');
-		}
-		return sb.toString();
-	}
-
 	private void setEdge(int[] arr, int idx) {
 		standardlize();
 		Util.setComb(arr, 69 - idx / 24, 4);

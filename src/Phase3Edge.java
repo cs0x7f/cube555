@@ -190,37 +190,4 @@ class Phase3Edge {
 			break;
 		}
 	}
-
-	static int[] Sym2Raw = new int[170971];
-	static int[] WEdgeSelfSym = new int[170971];
-	static int[] Raw2Sym = new int[2704156];
-	static int[][] WEdgeSymMove;
-
-	static int[][] MEdgeMove;
-	static int[][] MEdgeConj;
-
-	static void initMoveConj() {
-		Phase3Edge edge = new Phase3Edge();
-		MEdgeMove = new int[2048][VALID_MOVES.length];
-		MEdgeConj = new int[2048][16];
-		for (int i = 0; i < 2048; i++) {
-			for (int m = 0; m < VALID_MOVES.length; m++) {
-				edge.setMEdge(i);
-				edge.doMove(m);
-				MEdgeMove[i][m] = edge.getMEdge();
-			}
-
-			edge.setMEdge(i);
-			for (int sym = 0; sym < 16; sym++) {
-				MEdgeConj[i][CubieCube.SymMultInv[0][sym]] = edge.getMEdge();
-				edge.doConj(0);
-				if ((sym & 3) == 3) {
-					edge.doConj(1);
-				}
-				if ((sym & 7) == 7) {
-					edge.doConj(2);
-				}
-			}
-		}
-	}
 }

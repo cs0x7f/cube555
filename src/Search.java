@@ -52,7 +52,6 @@ public class Search {
 		startTime = System.nanoTime();
 		for (SolvingCube sc : p1sols) {
 			sc.addCheckPoint();
-			// System.out.println(sc);
 		}
 
 		ArrayList<SolvingCube> p2sols = new ArrayList<SolvingCube>();
@@ -73,7 +72,6 @@ public class Search {
 		startTime = System.nanoTime();
 		for (SolvingCube sc : p2sols) {
 			sc.addCheckPoint();
-			// System.out.println(sc);
 		}
 
 		ArrayList<SolvingCube> p3sols = new ArrayList<SolvingCube>();
@@ -109,7 +107,6 @@ public class Search {
 		startTime = System.nanoTime();
 		for (SolvingCube sc : p3sols) {
 			sc.addCheckPoint();
-			// System.out.println(sc);
 		}
 
 		ArrayList<SolvingCube> p4sols = new ArrayList<SolvingCube>();
@@ -127,7 +124,6 @@ public class Search {
 		startTime = System.nanoTime();
 		for (SolvingCube sc : p4sols) {
 			sc.addCheckPoint();
-			// System.out.println(sc);
 		}
 
 		ArrayList<SolvingCube> p5sols = new ArrayList<SolvingCube>();
@@ -172,14 +168,6 @@ public class Search {
 		Phase5Search.initCenterMove();
 		Phase5Search.initEdgeMove();
 		Phase5Search.initPrun();
-
-		// Phase5Search.initEdgePrun();
-
-		// if (true) {
-		// 	CubieCube cc = new CubieCube();
-		// 	cc.doMove(Ux3, Dx1, rx1, Dx3, Bx1, Ux2, Rx2, fx2, Fx2, Bx2, bx3, ux1, rx2, fx1, ux2, Ux1, Fx3, Ux2, Fx3, ux1, Lx3, Fx3, lx2, Bx2, Fx2, ux2, Lx2, bx1, Rx1, Fx3, Lx1, ux1, Dx1, rx1, Lx2, dx1, lx2, bx1, lx3, Dx3, Lx2, fx2, Dx2, Fx3, bx1, Rx1, fx2, lx1, Dx3, ux2, Lx2, dx2, Ux3, lx1, Lx3, rx2, Fx3, lx2, Dx1, Rx2);
-		// 	solveSingle(cc);
-		// }
 
 		java.util.Random gen = new java.util.Random(42L);
 		for (int i = 0; i < 100; i++) {

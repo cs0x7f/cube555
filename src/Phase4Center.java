@@ -134,19 +134,6 @@ class Phase4Center {
 		}
 	}
 
-	/*
-					0	0	1
-					3		1
-					3	2	2
-
-	7	7	4						3	3	0
-	6		4						2		0
-	6	5	5						2	1	1
-
-					4	4	5
-					7		5
-					7	6	6
-	*/
 	void doConj(int conj) {
 		switch (conj) {
 		case 0: //x2
