@@ -448,6 +448,20 @@ class Util {
 		}
 	}
 
+	static class TableSymCoord extends SymCoord {
+		int[][] moveTable;
+		TableSymCoord(int[][] moveTable, int[] SelfSym, int N_SYM) {
+			this.moveTable = moveTable;
+			this.SelfSym = SelfSym;
+			this.N_SYM = N_SYM;
+			this.N_IDX = moveTable.length;
+			this.N_MOVES = moveTable[0].length;
+		}
+		int getMoved(int move) {
+			return moveTable[idx][move];
+		}
+	}
+
 	static class TableRawCoord extends RawCoord {
 		int[][] moveTable;
 		int[][] conjTable;

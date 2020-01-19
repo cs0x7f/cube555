@@ -112,29 +112,13 @@ class Phase1Search extends PhaseSearch {
 			}
 		}
 
-		TCenterSymPrun = new PruningTable(new SymCoord() {
-			{
-				N_IDX = 46935;
-				N_MOVES = VALID_MOVES.length;
-				N_SYM = 16;
-				SelfSym = TCenterSelfSym;
-			}
-			int getMoved(int move) {
-				return TCenterSymMove[idx][move];
-			}
-		}, null, "Phase1TCenterSym");
+		TCenterSymPrun = new PruningTable(
+		    new TableSymCoord(TCenterSymMove, TCenterSelfSym, 16)
+		    , null, "Phase1TCenterSym");
 
-		XCenterSymPrun = new PruningTable(new SymCoord() {
-			{
-				N_IDX = 46371;
-				N_MOVES = VALID_MOVES.length;
-				N_SYM = 16;
-				SelfSym = XCenterSelfSym;
-			}
-			int getMoved(int move) {
-				return XCenterSymMove[idx][move];
-			}
-		}, null, "Phase1XCenterSym");
+		XCenterSymPrun = new PruningTable(
+		    new TableSymCoord(XCenterSymMove, XCenterSelfSym, 16)
+		    , null, "Phase1XCenterSym");
 	}
 
 	static class Phase1Node extends Node {

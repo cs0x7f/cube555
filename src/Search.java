@@ -168,9 +168,11 @@ public class Search {
 		Phase4Search.initMLEdgeSymMove();
 		Phase4Search.initPrun();
 
+		Phase5Search.initLEdgeSymMove();
 		Phase5Search.initCenterMove();
 		Phase5Search.initEdgeMove();
 		Phase5Search.initPrun();
+
 		// Phase5Search.initEdgePrun();
 
 		// if (true) {

@@ -208,19 +208,7 @@ class Phase4Search extends PhaseSearch {
 		for (int i = 0; i < UDSOLVED.length / 2; i++) {
 			RLSOLVED[i] = RLCenter2Half[UDSOLVED[i]];
 		}
-
-		SymCoord MLEdgeSymCoord = new SymCoord() {
-			{
-				N_IDX = 29616;
-				N_MOVES = VALID_MOVES.length;
-				N_SYM = 4;
-				SelfSym = MLEdgeSelfSym;
-			}
-			int getMoved(int move) {
-				return MLEdgeSymMove[idx][move];
-			}
-		};
-
+		SymCoord MLEdgeSymCoord = new TableSymCoord(MLEdgeSymMove, MLEdgeSelfSym, 4);
 		CenterPrun = new PruningTable(RLCenterMove, UDCenterMove, RLSOLVED, UDSOLVED, "Phase4Center");
 		MLEdgeSymUDCenterPrun = new PruningTable(MLEdgeSymCoord, new TableRawCoord(UDCenterMove, UDCenterConj), packSolved(null, UDSOLVED), "Phase4MLEdgeSymUDCenter");
 		MLEdgeSymRLCenterPrun = new PruningTable(MLEdgeSymCoord, new TableRawCoord(RLCenterMove, RLCenterConj), packSolved(null, RLSOLVED), "Phase4MLEdgeSymRLCenter");

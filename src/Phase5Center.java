@@ -113,4 +113,56 @@ class Phase5Center {
 			break;
 		}
 	}
+
+	void doConj(int conj) {
+		switch (conj) {
+		case 0: //y
+			swap(tCenter, 0, 1, 2, 3, 0);
+			swap(xCenter, 0, 1, 2, 3, 0);
+			swap(tCenter, 4, 5, 6, 7, 2);
+			swap(xCenter, 4, 5, 6, 7, 2);
+			for (int i = 0; i < 4; i++) {
+				rflbCenter[i] = -1 - rflbCenter[i];
+			}
+			swap(rflbCenter, 1, 7, 3, 5, 0);
+			swap(rflbCenter, 0, 6, 2, 4, 0);
+			break;
+		case 1: //x2
+			swap(tCenter, 0, 4);
+			swap(tCenter, 1, 5);
+			swap(tCenter, 2, 6);
+			swap(tCenter, 3, 7);
+			swap(xCenter, 0, 4);
+			swap(xCenter, 1, 5);
+			swap(xCenter, 2, 6);
+			swap(xCenter, 3, 7);
+			swap(rflbCenter, 0, 3);
+			swap(rflbCenter, 4, 5);
+			swap(rflbCenter, 1, 2);
+			swap(rflbCenter, 6, 7);
+			for (int i = 0; i < 8; i++) {
+				tCenter[i] = -1 - tCenter[i];
+				xCenter[i] = -1 - xCenter[i];
+			}
+			for (int i = 0; i < 4; i++) {
+				rflbCenter[i] = -1 - rflbCenter[i];
+			}
+			break;
+		case 2: //lr mirror
+			swap(tCenter, 1, 3);
+			swap(tCenter, 5, 7);
+			swap(xCenter, 0, 1);
+			swap(xCenter, 2, 3);
+			swap(xCenter, 4, 5);
+			swap(xCenter, 6, 7);
+			swap(rflbCenter, 0, 1);
+			swap(rflbCenter, 2, 3);
+			swap(rflbCenter, 4, 7);
+			swap(rflbCenter, 5, 6);
+			for (int i = 4; i < 8; i++) {
+				rflbCenter[i] = -1 - rflbCenter[i];
+			}
+			break;
+		}
+	}
 }

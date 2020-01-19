@@ -120,4 +120,45 @@ class Phase5Edge {
 			break;
 		}
 	}
+
+	void doConj(int conj) {
+		isStd = false;
+		switch (conj) {
+		case 0: //y
+			swap(mEdge, 0, 4, 1, 5, 0);
+			swap(lEdge, 0, 4, 1, 5, 0);
+			swap(hEdge, 0, 4, 1, 5, 0);
+			swap(mEdge, 2, 7, 3, 6, 2);
+			swap(lEdge, 2, 7, 3, 6, 2);
+			swap(hEdge, 2, 7, 3, 6, 2);
+			break;
+		case 1: //x2
+			swap(mEdge, 0, 2);
+			swap(lEdge, 0, 2);
+			swap(hEdge, 0, 2);
+			swap(mEdge, 1, 3);
+			swap(lEdge, 1, 3);
+			swap(hEdge, 1, 3);
+			swap(mEdge, 4, 7);
+			swap(hEdge, 4, 7);
+			swap(lEdge, 4, 7);
+			swap(mEdge, 5, 6);
+			swap(hEdge, 5, 6);
+			swap(lEdge, 5, 6);
+			break;
+		case 2: //lr mirror
+			for (int i = 0; i < 8; i++) {
+				int tmp = lEdge[i];
+				lEdge[i] = hEdge[i];
+				hEdge[i] = tmp;
+			}
+			swap(mEdge, 4, 5);
+			swap(lEdge, 4, 5);
+			swap(hEdge, 4, 5);
+			swap(mEdge, 6, 7);
+			swap(lEdge, 6, 7);
+			swap(hEdge, 6, 7);
+			break;
+		}
+	}
 }
