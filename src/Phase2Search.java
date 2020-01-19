@@ -49,9 +49,6 @@ class Phase2Search extends PhaseSearch {
 			return Math.max(prunTCenter.getPrun(tCenter, eParity),
 			                prunXCenter.getPrun(xCenter, eParity));
 		}
-		boolean isSolved() {
-			return tCenter == 0 && xCenter == 0 && eParity == 0;
-		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase2Node node = (Phase2Node) node0;
 			tCenter = TCenterMove[node.tCenter][move];

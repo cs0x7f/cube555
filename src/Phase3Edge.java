@@ -180,6 +180,14 @@ class Phase3Edge {
 				wEdge[i] = -1 - wEdge[i];
 			}
 			break;
+		case 3: //change lh edges
+			for (int i = 0; i < 24; i++) {
+				wEdge[i] = -1 - wEdge[i];
+			}
+			for (int i = 0; i < 12; i++) {
+				mEdge[i] ^= 1;
+			}
+			break;
 		}
 	}
 

@@ -247,9 +247,6 @@ class Phase4Search extends PhaseSearch {
 			return Math.max(prun,
 			                MLEdgeSymUDCenterPrun.getPrun(mhEdges >> 2, UDCenterConj[udCenter][mhEdges & 3 | 4]));
 		}
-		boolean isSolved() {
-			return mEdge == 0 && lEdge == 0 && hEdge == 0;
-		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase4Node node = (Phase4Node) node0;
 			rlCenter = RLCenterMove[node.rlCenter][move];

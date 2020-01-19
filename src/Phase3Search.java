@@ -15,7 +15,6 @@ class Phase3Search extends PhaseSearch {
 	static int NEXT_AXIS = 0x12492;
 
 	static int[][] CenterMove;
-	// static int[][] CenterConj;
 	static int[][] MEdgeMove;
 	static int[][] MEdgeConj;
 	static PruningTable CenterMEdgePrun;
@@ -28,17 +27,17 @@ class Phase3Search extends PhaseSearch {
 	static void initWEdgeSymMove() {
 		Phase3Edge edge = new Phase3Edge();
 		int symCnt = 0;
-		WEdgeSym2Raw = new int[170971];
-		WEdgeSelfSym = new int[170971];
+		WEdgeSym2Raw = new int[86048];
+		WEdgeSelfSym = new int[86048];
 		WEdgeRaw2Sym = new int[2704156];
 		for (int i = 0; i < WEdgeRaw2Sym.length; i++) {
 			if (WEdgeRaw2Sym[i] != 0) {
 				continue;
 			}
 			edge.setWEdge(i);
-			for (int sym = 0; sym < 16; sym++) {
+			for (int sym = 0; sym < 32; sym++) {
 				int idx = edge.getWEdge();
-				WEdgeRaw2Sym[idx] = symCnt << 4 | sym;
+				WEdgeRaw2Sym[idx] = symCnt << 5 | sym;
 				if (idx == i) {
 					WEdgeSelfSym[symCnt] |= 1 << sym;
 				}
@@ -48,6 +47,9 @@ class Phase3Search extends PhaseSearch {
 				}
 				if ((sym & 7) == 7) {
 					edge.doConj(2);
+				}
+				if ((sym & 0xf) == 0xf) {
+					edge.doConj(3);
 				}
 			}
 			WEdgeSym2Raw[symCnt] = i;
@@ -66,7 +68,7 @@ class Phase3Search extends PhaseSearch {
 	static void initMEdgeMove() {
 		Phase3Edge edge = new Phase3Edge();
 		MEdgeMove = new int[2048][VALID_MOVES.length];
-		MEdgeConj = new int[2048][16];
+		MEdgeConj = new int[2048][32];
 		for (int i = 0; i < 2048; i++) {
 			for (int m = 0; m < VALID_MOVES.length; m++) {
 				edge.setMEdge(i);
@@ -75,14 +77,17 @@ class Phase3Search extends PhaseSearch {
 			}
 
 			edge.setMEdge(i);
-			for (int sym = 0; sym < 16; sym++) {
-				MEdgeConj[i][CubieCube.SymMultInv[0][sym]] = edge.getMEdge();
+			for (int sym = 0; sym < 32; sym++) {
+				MEdgeConj[i][CubieCube.SymMultInv[0][sym & 0xf] | sym & 0x10] = edge.getMEdge();
 				edge.doConj(0);
 				if ((sym & 3) == 3) {
 					edge.doConj(1);
 				}
 				if ((sym & 7) == 7) {
 					edge.doConj(2);
+				}
+				if ((sym & 0xf) == 0xf) {
+					edge.doConj(3);
 				}
 			}
 		}
@@ -91,84 +96,47 @@ class Phase3Search extends PhaseSearch {
 	static void initCenterMove() {
 		Phase3Center center = new Phase3Center();
 		CenterMove = new int[1225][VALID_MOVES.length];
-		// CenterConj = new int[1225][16];
 		for (int i = 0; i < 1225; i++) {
 			for (int m = 0; m < VALID_MOVES.length; m++) {
 				center.setCenter(i);
 				center.doMove(m);
 				CenterMove[i][m] = center.getCenter();
 			}
-
-			// center.setCenter(i);
-			// for (int sym = 0; sym < 16; sym++) {
-			// 	CenterConj[i][CubieCube.SymMultInv[0][sym]] = center.getCenter();
-			// 	center.doConj(0);
-			// 	if ((sym & 3) == 3) {
-			// 		center.doConj(1);
-			// 	}
-			// 	if ((sym & 7) == 7) {
-			// 		center.doConj(2);
-			// 	}
-			// }
 		}
 	}
 
-	static PruningTable WEdgeSymPrun;
 	static PruningTable WMEdgeSymPrun;
-	static PruningTable CenterWEdgeSym;
 
 	static void initPrun() {
-		CenterMEdgePrun = new PruningTable(CenterMove, MEdgeMove, Phase3Center.SOLVED_CENTER, null, "Phase3CenterMEdge");
+		CenterMEdgePrun = new PruningTable(
+		    CenterMove, MEdgeMove,
+		    Phase3Center.SOLVED_CENTER, new int[] {0, 2047},
+		    "Phase3CenterMEdge");
 
-		WEdgeSymPrun = new PruningTable(new SymCoord() {
-			{
-				N_IDX = 170971;
-				N_MOVES = VALID_MOVES.length;
-				N_SYM = 16;
-				SelfSym = WEdgeSelfSym;
-			}
-			int getMoved(int move) {
-				return WEdgeSymMove[idx][move];
-			}
-		}, null, "Phase3WEdgeSym");
-
+		int[] mEdgeFlip = new int[1];
 		WMEdgeSymPrun = new PruningTable(new SymCoord() {
 			{
-				N_IDX = 170971;
+				N_IDX = 86048;
 				N_MOVES = VALID_MOVES.length;
 				N_SYM = 16;
 				SelfSym = WEdgeSelfSym;
 			}
 			int getMoved(int move) {
-				return WEdgeSymMove[idx][move];
+				int val = WEdgeSymMove[idx][move];
+				mEdgeFlip[0] = (val & 0x10) == 0 ? 0 : 0x7ff;
+				return val >> 1 & ~0xf | val & 0xf;
 			}
-		}, new TableRawCoord(MEdgeMove, MEdgeConj), null, "Phase3MWEdgeSym");
-
-		// int[][] SolvedSymRaw = new int[108][2];
-		// for (int i = 0; i < 108; i++) {
-		// 	SolvedSymRaw[i][1] = Phase3Center.SOLVED_CENTER[i];
-		// }
-		// CenterWEdgeSym = new PruningTable(new SymCoord() {
-		// 	{
-		// 		N_IDX = 170971;
-		// 		N_MOVES = VALID_MOVES.length;
-		// 		N_SYM = 16;
-		// 		SelfSym = WEdgeSelfSym;
-		// 	}
-		// 	int getMoved(int move) {
-		// 		return WEdgeSymMove[idx][move];
-		// 	}
-		// }, new RawCoord() {
-		// 	{
-		// 		N_IDX = 1225;
-		// 	}
-		// 	int getMoved(int move) {
-		// 		return CenterMove[idx][move];
-		// 	}
-		// 	int getConj(int idx, int conj) {
-		// 		return CenterConj[idx][conj];
-		// 	}
-		// }, SolvedSymRaw, "Phase3CenterWEdgeSym");
+		}, new RawCoord() {
+			{
+				N_IDX = 2048;
+			}
+			int getMoved(int move) {
+				return MEdgeMove[idx][move] ^ mEdgeFlip[0];
+			}
+			int getConj(int idx, int conj) {
+				return MEdgeConj[idx][conj];
+			}
+		}, null, "Phase3MWEdgeSym");
 	}
 
 	static class Phase3Node extends Node {
@@ -178,20 +146,13 @@ class Phase3Search extends PhaseSearch {
 		int getPrun() {
 			return Math.max(
 			           CenterMEdgePrun.getPrun(center, mEdge),
-			           WMEdgeSymPrun.getPrun(wEdge >> 4, MEdgeConj[mEdge][wEdge & 0xf]));
-
-			// Math.max(
-			//     WMEdgeSymPrun.getPrun(wEdge >> 4, MEdgeConj[mEdge][wEdge & 0xf]),
-			//     CenterWEdgeSym.getPrun(wEdge >> 4, CenterConj[center][wEdge & 0xf])));
-		}
-		boolean isSolved() {
-			return mEdge == 0 && (wEdge >> 4) == 0;
+			           WMEdgeSymPrun.getPrun(wEdge >> 5, MEdgeConj[mEdge][wEdge & 0x1f]));
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase3Node node = (Phase3Node) node0;
 			center = CenterMove[node.center][move];
 			mEdge = MEdgeMove[node.mEdge][move];
-			wEdge = WEdgeSymMove[node.wEdge >> 4][SymMove[node.wEdge & 0xf][move]];
+			wEdge = WEdgeSymMove[node.wEdge >> 5][SymMove[node.wEdge & 0xf][move]] ^ (node.wEdge & 0x10);
 			wEdge = wEdge & ~0xf | CubieCube.SymMult[wEdge & 0xf][node.wEdge & 0xf];
 			return getPrun();
 		}
@@ -217,7 +178,7 @@ class Phase3Search extends PhaseSearch {
 		int center = ct.getCenter();
 		java.util.ArrayList<Node> nodes = new java.util.ArrayList<Node>();
 		for (int filter = 8; nodes.size() == 0; filter++) {
-			for (int idx = 0; idx < 2048; idx++) {
+			for (int idx = 0; idx < 1024; idx++) {
 				Phase3Node node = new Phase3Node();
 				int flip = idx << 1 | (Integer.bitCount(idx) & 1);
 				flip = (flip ^ 0xfff) << 12 | flip;

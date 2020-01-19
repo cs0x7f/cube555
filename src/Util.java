@@ -589,6 +589,7 @@ class Util {
 				done = 0;
 				realDone = 0;
 				boolean inv = cumDone > N_STATE / 2;
+				// boolean inv = true;
 				int select = inv ? 0xf : depth;
 				int check = inv ? depth : 0xf;
 				int fill = depth + 1;

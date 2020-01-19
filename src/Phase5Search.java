@@ -117,9 +117,6 @@ class Phase5Search extends PhaseSearch {
 			                    HEdgeCenterPrun.getPrun(hEdge, center % 4900))
 			       );
 		}
-		boolean isSolved() {
-			return lEdge == 0 && hEdge == 0 && center == 0;
-		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase5Node node = (Phase5Node) node0;
 			center = CenterMove[node.center][move];

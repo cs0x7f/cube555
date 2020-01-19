@@ -143,9 +143,6 @@ class Phase1Search extends PhaseSearch {
 		int getPrun() {
 			return Math.max(TCenterSymPrun.getPrun(tCenter >> 4), XCenterSymPrun.getPrun(xCenter >> 4));
 		}
-		boolean isSolved() {
-			return (tCenter >> 4) == 0 && (xCenter >> 4) == 0;
-		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase1Node node = (Phase1Node) node0;
 

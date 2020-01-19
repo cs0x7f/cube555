@@ -77,8 +77,13 @@ class PhaseSearch {
 	}
 
 	abstract static class Node {
+		/**
+		 *  other requirements besides getPrun() == 0
+		 */
+		boolean isSolved() {
+			return true;
+		}
 		abstract int doMovePrun(Node node, int move, int maxl);
-		abstract boolean isSolved();
 		abstract int getPrun();
 	}
 
