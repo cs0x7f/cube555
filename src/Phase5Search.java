@@ -22,6 +22,13 @@ class Phase5Search extends PhaseSearch {
 	static PruningTable CenterPrun;
 	static PruningTable LEdgeSymCenterPrun;
 
+	static void init() {
+		initLEdgeSymMove();
+		initCenterMove();
+		initEdgeMove();
+		initPrun();
+	}
+
 	static void initEdgeMove() {
 		LEdgeMove = new int[40320][VALID_MOVES.length];
 		Phase5Edge edge = new Phase5Edge();

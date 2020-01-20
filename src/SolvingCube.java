@@ -46,6 +46,17 @@ class SolvingCube extends CubieCube {
 		conjIdx = CubieCube.SymMult[conjIdx][idx];
 	}
 
+	int[] getSolution() {
+		int[] ret = new int[moveCost];
+		int i = 0;
+		for (int m : solution) {
+			if (m != -1) {
+				ret[i++] = m;
+			}
+		}
+		return ret;
+	}
+
 	void addCheckPoint() {
 		solution.add(-1);
 	}
@@ -54,10 +65,13 @@ class SolvingCube extends CubieCube {
 		return moveCost;
 	}
 
-	String toSolutionString() {
+	String toSolutionString(int verbose) {
 		StringBuffer sb = new StringBuffer();
 		for (int move : solution) {
 			if (move == -1) {
+				if ((verbose & Search.USE_SEPARATOR) != 0) {
+					sb.append(".  ");
+				}
 				continue;
 			}
 			sb.append(move2str[move]).append(' ');

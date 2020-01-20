@@ -16,6 +16,11 @@ class Phase2Search extends PhaseSearch {
 	static PruningTable prunTCenter;
 	static PruningTable prunXCenter;
 
+	static void init() {
+		initCenterMove();
+		initCenterPrun();
+	}
+
 	static void initCenterMove() {
 		Phase2Center ct = new Phase2Center();
 		TCenterMove = new int[12870][VALID_MOVES.length];

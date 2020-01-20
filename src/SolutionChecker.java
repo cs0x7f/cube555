@@ -1,8 +1,23 @@
 package cs.cube555;
 
-abstract class SolutionChecker {
+class SolutionChecker {
 
-	abstract int check(int[] solution, int length, int ccidx);
+	SolvingCube[] ccList;
+
+	SolutionChecker(SolvingCube[] ccList) {
+		this.ccList = ccList;
+	}
+
+	int check(int[] solution, int length, int ccidx) {
+		SolvingCube sc = new SolvingCube(ccList[ccidx]);
+		sc.doMove(copySolution(solution, length));
+		sc.addCheckPoint();
+		return check(sc);
+	}
+
+	int check(SolvingCube sc) {
+		return 0;
+	}
 
 	static int[] copySolution(int[] solution, int length) {
 		int[] solutionCopy = new int[length];

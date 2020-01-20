@@ -40,6 +40,10 @@ class Phase1Search extends PhaseSearch {
 
 	static int[][] SymMove;
 
+	static void init() {
+		initCenter();
+	}
+
 	static void initCenter() {
 		Phase1Center center = new Phase1Center();
 		int symCnt = 0;

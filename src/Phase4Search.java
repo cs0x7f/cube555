@@ -30,6 +30,13 @@ class Phase4Search extends PhaseSearch {
 	static PruningTable MLEdgeSymUDCenterPrun;
 	static PruningTable MLEdgeSymRLCenterPrun;
 
+	static void init() {
+		initCenterMove();
+		initEdgeMove();
+		initMLEdgeSymMove();
+		initPrun();
+	}
+
 	static void initEdgeMove() {
 		Phase4Edge edge = new Phase4Edge();
 		for (int mEdge = 0; mEdge < 70; mEdge++) {
@@ -102,7 +109,7 @@ class Phase4Search extends PhaseSearch {
 			}
 		}
 
-		int[] mEdge = new int[2];
+		final int[] mEdge = new int[2];
 		EdgePrunSym = new PruningTable(new SymCoord() {
 			{
 				N_IDX = 29616;

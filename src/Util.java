@@ -385,6 +385,34 @@ class Util {
 		arr[b] = temp;
 	}
 
+	static void swapCorner(int[] arr, int a, int b, int c, int d, int pow) {
+		int temp;
+		switch (pow) {
+		case 0:
+			temp = (arr[d] + 8) % 24;
+			arr[d] = (arr[c] + 16) % 24;
+			arr[c] = (arr[b] + 8) % 24;
+			arr[b] = (arr[a] + 16) % 24;
+			arr[a] = temp;
+			return;
+		case 1:
+			temp = arr[a];
+			arr[a] = arr[c];
+			arr[c] = temp;
+			temp = arr[b];
+			arr[b] = arr[d];
+			arr[d] = temp;
+			return;
+		case 2:
+			temp = (arr[a] + 8) % 24;
+			arr[a] = (arr[b] + 16) % 24;
+			arr[b] = (arr[c] + 8) % 24;
+			arr[c] = (arr[d] + 16) % 24;
+			arr[d] = temp;
+			return;
+		}
+	}
+
 	static void swap(int[] arr, int a, int b, int c, int d, int pow, boolean flip) {
 		int xor = flip ? 1 : 0;
 		int temp;
@@ -536,7 +564,7 @@ class Util {
 			initPrunTable(new TableRawCoord(Move, null), Solved, filename);
 		}
 
-		PruningTable(int[][] Move1, int[][] Move2, int[] Solved1, int[] Solved2, String filename) {
+		PruningTable(final int[][] Move1, final int[][] Move2, int[] Solved1, int[] Solved2, String filename) {
 			N_STATE2 = Move2.length;
 			N_STATE = Move1.length * Move2.length;
 			if (Solved1 == null) {

@@ -24,6 +24,13 @@ class Phase3Search extends PhaseSearch {
 	static int[] WEdgeSelfSym;
 	static int[] WEdgeRaw2Sym;
 
+	static void init() {
+		initWEdgeSymMove();
+		initMEdgeMove();
+		initCenterMove();
+		initPrun();
+	}
+
 	static void initWEdgeSymMove() {
 		Phase3Edge edge = new Phase3Edge();
 		int symCnt = 0;
@@ -113,7 +120,7 @@ class Phase3Search extends PhaseSearch {
 		    Phase3Center.SOLVED_CENTER, new int[] {0, 2047},
 		    "Phase3CenterMEdge");
 
-		int[] mEdgeFlip = new int[1];
+		final int[] mEdgeFlip = new int[1];
 		WMEdgeSymPrun = new PruningTable(new SymCoord() {
 			{
 				N_IDX = 86048;

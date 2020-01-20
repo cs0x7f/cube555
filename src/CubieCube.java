@@ -72,6 +72,15 @@ class CubieCube {
 	    D21, D22, D23, D24, D25
 	};
 
+	static int[] MAP333_FACELET = new int[] {
+	    U1, U3, U5, U11, U13, U15, U21, U23, U25,
+	    R1, R3, R5, R11, R13, R15, R21, R23, R25,
+	    F1, F3, F5, F11, F13, F15, F21, F23, F25,
+	    D1, D3, D5, D11, D13, D15, D21, D23, D25,
+	    L1, L3, L5, L11, L13, L15, L21, L23, L25,
+	    B1, B3, B5, B11, B13, B15, B21, B23, B25
+	};
+
 	static int[] TCENTER = new int[] {
 	    U8, U14, U18, U12,
 	    D8, D14, D18, D12,
@@ -105,12 +114,18 @@ class CubieCube {
 		{F6, L10}, {B20, L16}, {B6, R10}, {F20, R16}
 	};
 
+	static int[][] CORNER = new int[][] {
+		{U25, R1, F5}, {U21, F1, L5}, {U1, L1, B5}, {U5, B1, R5},
+		{D5, F25, R21}, {D1, L25, F21}, {D21, B25, L21}, {D25, R25, B21}
+	};
+
 	static CubieCube SOLVED = new CubieCube();
 
 	int[] tCenter = new int[24];
 	int[] xCenter = new int[24];
 	int[] mEdge = new int[12];
 	int[] wEdge = new int[24];
+	CornerCube corner = new CornerCube();
 
 	CubieCube() {
 		for (int i = 0; i < 24; i++) {
@@ -138,8 +153,25 @@ class CubieCube {
 		}
 	}
 
+	static String to333Facelet(String facelet) {
+		StringBuffer sb = new StringBuffer();
+		for (int i : MAP333_FACELET) {
+			sb.append(facelet.charAt(i));
+		}
+		return sb.toString();
+	}
+
+	static String fill333Facelet(String facelet, String facelet333) {
+		StringBuffer sb = new StringBuffer(facelet);
+		for (int i = 0; i < MAP333_FACELET.length; i++) {
+			sb.setCharAt(MAP333_FACELET[i], facelet333.charAt(i));
+		}
+		return sb.toString();
+	}
+
 	int fromFacelet(String facelet) {
 		int[] face = new int[150];
+		long colorCnt = 0;
 		try {
 			String colors = new String(
 			    new char[] {
@@ -152,6 +184,7 @@ class CubieCube {
 				if (face[i] == -1) {
 					return -1;
 				}
+				colorCnt += 1L << face[i] * 8;
 			}
 		} catch (Exception e) {
 			return -1;
@@ -192,20 +225,49 @@ class CubieCube {
 				}
 			}
 		}
-		if (tCenterCnt != 0x444444) {
+		int ori = 0;
+		int cornerCnt = 0;
+		int cornerChk = 0;
+		for (int i = 0; i < 8; i++) {
+			for (ori = 0; ori < 3; ori++) {
+				if (face[CORNER[i][ori]] == 0 || face[CORNER[i][ori]] == 3) {
+					break;
+				}
+			}
+			int col1 = face[CORNER[i][(ori + 1) % 3]];
+			int col2 = face[CORNER[i][(ori + 2) % 3]];
+			for (int j = 0; j < 8; j++) {
+				if (col1 == CORNER[j][1] / 25 && col2 == CORNER[j][2] / 25) {
+					corner.cp[i] = j;
+					corner.co[i] = ori;
+					cornerChk += ori;
+					cornerCnt |= 1 << j;
+					break;
+				}
+			}
+		}
+		int[] ep = new int[12];
+		for (int i = 0; i < 12; i++) {
+			ep[i] = mEdge[i] >> 1;
+		}
+		if (colorCnt != 0x191919191919L) {
+			return -1;
+		} else if (tCenterCnt != 0x444444) {
 			return -2;
-		}
-		if (xCenterCnt != 0x444444) {
+		} else if (xCenterCnt != 0x444444) {
 			return -3;
-		}
-		if (mEdgeCnt != 0xfff) {
+		} else if (mEdgeCnt != 0xfff) {
 			return -4;
-		}
-		if (wEdgeCnt != 0xffffff) {
+		} else if (wEdgeCnt != 0xffffff) {
 			return -5;
-		}
-		if (mEdgeChk != 0) {
+		} else if (cornerCnt != 0xff) {
 			return -6;
+		} else if (mEdgeChk != 0) {
+			return -7;
+		} else if (cornerChk % 3 != 0) {
+			return -8;
+		} else if (getParity(ep) != getParity(corner.cp)) {
+			return -9;
 		}
 		return 0;
 	}
@@ -228,6 +290,13 @@ class CubieCube {
 			int ori = mEdge[i] & 1;// Orientation of this cubie
 			for (int j = 0; j < 2; j++) {
 				face[MEDGE[i][j ^ ori]] = colors.charAt(MEDGE[perm][j] / 25);
+			}
+		}
+		for (int i = 0; i < 8; i++) {
+			int j = corner.cp[i];
+			int ori = corner.co[i];
+			for (int n = 0; n < 3; n++) {
+				face[CORNER[i][(n + ori) % 3]] = colors.charAt(CORNER[j][n] / 25);
 			}
 		}
 		return new String(face);
@@ -261,6 +330,12 @@ class CubieCube {
 		           "           %s%s%s%s%s\n" +
 		           "           %s%s%s%s%s\033[0m\n",
 		           (Object []) arr);
+	}
+
+	void doCornerMove(int... moves) {
+		for (int move : moves) {
+			corner.doMove(move % 18);
+		}
 	}
 
 	void doMove(int... moves) {
@@ -401,7 +476,8 @@ class CubieCube {
 
 	static int[] COLOR_TO_CENTER = new int[] {0, 16, 8, 4, 20, 12};
 
-	static void initSym() {
+	static void init() {
+		CornerCube.initMove();
 		CubieCube c = new CubieCube();
 		for (int i = 0; i < 24; i++) {
 			c.tCenter[i] = i;
@@ -522,37 +598,62 @@ class CubieCube {
 		return ret;
 	}
 
-	public static void main(String[] args) {
-		initSym();
+	static class CornerCube {
 
-		// // // cc.conj(ConjX);
-		// for (int i = 0; i < 24; i++) {
-		// 	System.out.print(c.tCenter[i] + ", ");
-		// }
-		// System.out.println();
-		// for (int i = 0; i < 24; i++) {
-		// 	System.out.print(c.xCenter[i] + ", ");
-		// }
-		// System.out.println();
-		// for (int i = 0; i < 12; i++) {
-		// 	System.out.print(c.mEdge[i] + ", ");
-		// }
-		// System.out.println();
-		// for (int i = 0; i < 24; i++) {
-		// 	System.out.print(c.wEdge[i] + ", ");
-		// }
-		// System.out.println();
-		// System.out.println();
-		// System.out.println(cc);
-		// int ret = cc.fromFacelet("UDLFDLDDLUFDUBRLBDLFLRBFRBLBBFUDURDULRRBRLFUURBUFLUBDUDRURRRBUFUFFFRUFFLDUURURFFULFFRLFDBRRFRDDBRFBBLBRDFBBBBUDDLLLDBUULUDULDLDDLBRRLRLUBBFFBDLFBDDLFR");
-		// System.out.println(ret);
-		// System.out.println(cc);
-		// cc.doMove(rx1);
-		// System.out.println(cc);
+		private static CornerCube[] moveCube = new CornerCube[18];
 
-		// cc = new CubieCube();
-		// cc.doMove(Fx3, Bx1, fx1, rx2, Rx1, fx3, Rx3, Lx3, rx2, Ux1, lx1, Dx3, Ux3, fx3, Rx3, Ux2, fx2, Fx2, Ux2, ux2, rx3, lx1, Dx3, Bx2, Lx1, bx3, Dx2, ux1, bx2, Dx1, rx1, ux2, Ux2, Dx3, fx2, dx2, Bx3, dx1, Bx1, Ux2, Rx2, rx2, dx3, Rx2, bx2, dx1, ux3, bx1, Ux3, dx1, Lx3, Bx3, Dx1, Rx3, Bx3, Ux2, Fx2, Lx3, bx2, Bx1);
-		// System.out.println(cc);
+		int[] cp = {0, 1, 2, 3, 4, 5, 6, 7};
+		int[] co = {0, 0, 0, 0, 0, 0, 0, 0};
+
+		CornerCube() {}
+
+		CornerCube(int cperm, int twist) {
+			setPerm(cp, cperm);
+			int twst = 0;
+			for (int i = 6; i >= 0; i--) {
+				twst += co[i] = twist % 3;
+				twist /= 3;
+			}
+			co[7] = (15 - twst) % 3;
+		}
+
+		CornerCube(CornerCube c) {
+			copy(c);
+		}
+
+		void copy(CornerCube c) {
+			for (int i = 0; i < 8; i++) {
+				this.cp[i] = c.cp[i];
+				this.co[i] = c.co[i];
+			}
+		}
+
+		static void CornMult(CornerCube a, CornerCube b, CornerCube prod) {
+			for (int corn = 0; corn < 8; corn++) {
+				prod.cp[corn] = a.cp[b.cp[corn]];
+				prod.co[corn] = (a.co[b.cp[corn]] + b.co[corn]) % 3;
+			}
+		}
+
+		void doMove(int move) {
+			CornerCube cc = new CornerCube();
+			CornMult(this, moveCube[move], cc);
+			copy(cc);
+		}
+
+		static void initMove() {
+			moveCube[0] = new CornerCube(15120, 0);
+			moveCube[3] = new CornerCube(21021, 1494);
+			moveCube[6] = new CornerCube(8064, 1236);
+			moveCube[9] = new CornerCube(9, 0);
+			moveCube[12] = new CornerCube(1230, 412);
+			moveCube[15] = new CornerCube(224, 137);
+			for (int a = 0; a < 18; a += 3) {
+				for (int p = 0; p < 2; p++) {
+					moveCube[a + p + 1] = new CornerCube();
+					CornMult(moveCube[a + p], moveCube[a], moveCube[a + p + 1]);
+				}
+			}
+		}
 	}
-
 }
