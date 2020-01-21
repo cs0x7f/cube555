@@ -683,7 +683,7 @@ class Util {
 				}
 				cumDone += done;
 				cumRealDone += realDone;
-			} while (done > 0 && depth <= 15);
+			} while (done > 0 && depth < 15);
 			Tools.SaveToFile(filename + "Prun.jhdata", Prun);
 		}
 
