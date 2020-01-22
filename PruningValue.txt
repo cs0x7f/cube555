@@ -1,0 +1,169 @@
+Phase1TCenterSym: 0             1             1               1               1         0ms
+Phase1TCenterSym: 1             1             2               4               5        17ms
+Phase1TCenterSym: 2             6             8              66              71        17ms
+Phase1TCenterSym: 3            66            74             900             971        18ms
+Phase1TCenterSym: 4           635           709           9,626          10,597        19ms
+Phase1TCenterSym: 5         5,140         5,849          80,202          90,799        22ms
+Phase1TCenterSym: 6        20,922        26,771         329,202         420,001        32ms
+Phase1TCenterSym: 7        19,286        46,057         302,146         722,147        39ms
+Phase1TCenterSym: 8           878        46,935          13,324         735,471        40ms
+
+Phase1XCenterSym: 0             1             1               1               1         0ms
+Phase1XCenterSym: 1             1             2               4               5         0ms
+Phase1XCenterSym: 2             9            11              82              87         1ms
+Phase1XCenterSym: 3            86            97           1,206           1,293         1ms
+Phase1XCenterSym: 4           913         1,010          14,116          15,409         2ms
+Phase1XCenterSym: 5         7,827         8,837         123,404         138,813         4ms
+Phase1XCenterSym: 6        26,573        35,410         422,508         561,321        15ms
+Phase1XCenterSym: 7        10,903        46,313         173,254         734,575        18ms
+Phase1XCenterSym: 8            58        46,371             896         735,471        18ms
+
+Phase1CenterSym: 0             1             1               1               1         0ms
+Phase1CenterSym: 1             1             2               4               5         0ms
+Phase1CenterSym: 2            12            14              98             103         1ms
+Phase1CenterSym: 3           169           183           2,036           2,139         2ms
+Phase1CenterSym: 4         2,916         3,099          41,096          43,235         5ms
+Phase1CenterSym: 5        55,768        58,867         824,950         868,185        46ms
+Phase1CenterSym: 6     1,065,559     1,124,426      16,300,291      17,168,476       673ms
+Phase1CenterSym: 7    20,009,065    21,133,491     311,709,304     328,877,780     20925ms
+Phase1CenterSym- 0             1
+Phase1CenterSym- 1             1
+Phase1CenterSym- 2            12
+Phase1CenterSym- 3           169
+Phase1CenterSym- 4         2,916
+Phase1CenterSym- 5        55,751
+Phase1CenterSym- 6     1,056,613
+Phase1CenterSym- 7    17,058,271
+Phase1CenterSym- 8    48,935,130
+
+Phase2TCenter: 0             1             1         0ms
+Phase2TCenter: 1             2             3         0ms
+Phase2TCenter: 2            25            28         0ms
+Phase2TCenter: 3           210           238         1ms
+Phase2TCenter: 4           924         1,162         2ms
+Phase2TCenter: 5         2,914         4,076         3ms
+Phase2TCenter: 6         7,183        11,259         8ms
+Phase2TCenter: 7         8,353        19,612        15ms
+Phase2TCenter: 8         5,311        24,923        18ms
+Phase2TCenter: 9           807        25,730        19ms
+Phase2TCenter:10            10        25,740        20ms
+
+Phase2XCenter: 0             1             1         0ms
+Phase2XCenter: 1             2             3         0ms
+Phase2XCenter: 2            29            32         0ms
+Phase2XCenter: 3           234           266         0ms
+Phase2XCenter: 4         1,304         1,570         0ms
+Phase2XCenter: 5         5,568         7,138         1ms
+Phase2XCenter: 6        12,316        19,454         4ms
+Phase2XCenter: 7         6,102        25,556         5ms
+Phase2XCenter: 8           184        25,740         5ms
+
+Phase3CenterMEdge: 0           216           216         0ms
+Phase3CenterMEdge: 1           432           648         1ms
+Phase3CenterMEdge: 2         6,984         7,632         3ms
+Phase3CenterMEdge: 3        69,392        77,024         6ms
+Phase3CenterMEdge: 4       367,092       444,116        19ms
+Phase3CenterMEdge: 5       996,732     1,440,848        61ms
+Phase3CenterMEdge: 6       941,992     2,382,840       117ms
+Phase3CenterMEdge: 7       124,804     2,507,644       129ms
+Phase3CenterMEdge: 8         1,156     2,508,800       136ms
+
+Phase3MWEdgeSym: 0             1             1               1               1         0ms
+Phase3MWEdgeSym: 1             1             2               2               3       148ms
+Phase3MWEdgeSym: 2             5             7              33              36       263ms
+Phase3MWEdgeSym: 3            38            45             382             418       380ms
+Phase3MWEdgeSym: 4           308           353           3,920           4,338       505ms
+Phase3MWEdgeSym: 5         3,216         3,569          45,980          50,318       602ms
+Phase3MWEdgeSym: 6        34,162        37,731         515,594         565,912       707ms
+Phase3MWEdgeSym: 7       315,492       353,223       4,882,282       5,448,194       856ms
+Phase3MWEdgeSym: 8     2,416,258     2,769,481      37,725,852      43,174,046      1382ms
+Phase3MWEdgeSym: 9    13,698,067    16,467,548     214,944,909     258,118,955      3459ms
+Phase3MWEdgeSym:10    47,646,663    64,114,211     748,549,490   1,006,668,445     11862ms
+Phase3MWEdgeSym:11    74,936,949   139,051,160   1,177,896,283   2,184,564,728     36085ms
+Phase3MWEdgeSym:12    34,414,060   173,465,220     541,147,752   2,725,712,480     42568ms
+Phase3MWEdgeSym:13     2,741,214   176,206,434      43,045,056   2,768,757,536     43365ms
+Phase3MWEdgeSym:14        19,835   176,226,269         297,920   2,769,055,456     43848ms
+
+Phase4EdgeSym: 0             1             1               1               1         0ms
+Phase4EdgeSym: 1             2             3               4               5        51ms
+Phase4EdgeSym: 2            10            13              30              35        80ms
+Phase4EdgeSym: 3            56            69             200             235       108ms
+Phase4EdgeSym: 4           337           406           1,296           1,531       138ms
+Phase4EdgeSym: 5         2,100         2,506           8,187           9,718       168ms
+Phase4EdgeSym: 6        12,525        15,031          49,334          59,052       203ms
+Phase4EdgeSym: 7        71,445        86,476         283,026         342,078       257ms
+Phase4EdgeSym: 8       385,107       471,583       1,528,102       1,870,180       386ms
+Phase4EdgeSym: 9     1,889,220     2,360,803       7,504,518       9,374,698       818ms
+Phase4EdgeSym:10     7,564,378     9,925,181      30,068,326      39,443,024      2455ms
+Phase4EdgeSym:11    19,318,262    29,243,443      76,791,716     116,234,740      7186ms
+Phase4EdgeSym:12    18,165,899    47,409,342      72,115,012     188,349,752     11916ms
+Phase4EdgeSym:13     2,335,978    49,745,320       9,182,472     197,532,224     12494ms
+Phase4EdgeSym:14         9,560    49,754,880          35,776     197,568,000     12633ms
+
+Phase4Center: 0            18            18         0ms
+Phase4Center: 1            66            84         0ms
+Phase4Center: 2           573           657         1ms
+Phase4Center: 3         3,588         4,245         2ms
+Phase4Center: 4        18,418        22,663         3ms
+Phase4Center: 5        85,877       108,540         6ms
+Phase4Center: 6       251,742       360,282        15ms
+Phase4Center: 7       374,904       735,186        37ms
+Phase4Center: 8       241,868       977,054        52ms
+Phase4Center: 9        79,462     1,056,516        58ms
+Phase4Center:10         1,884     1,058,400        60ms
+
+Phase4MLEdgeSymUDCenter: 0             6             6               6               6         0ms
+Phase4MLEdgeSymUDCenter: 1            12            18              24              30        87ms
+Phase4MLEdgeSymUDCenter: 2            78            96             216             246       172ms
+Phase4MLEdgeSymUDCenter: 3           516           612           1,622           1,868       256ms
+Phase4MLEdgeSymUDCenter: 4         3,047         3,659          11,198          13,066       340ms
+Phase4MLEdgeSymUDCenter: 5        20,246        23,905          75,990          89,056       424ms
+Phase4MLEdgeSymUDCenter: 6       129,232       153,137         498,774         587,830       524ms
+Phase4MLEdgeSymUDCenter: 7       792,151       945,288       3,105,912       3,693,742       702ms
+Phase4MLEdgeSymUDCenter: 8     4,459,706     5,404,994      17,585,391      21,279,133      1279ms
+Phase4MLEdgeSymUDCenter: 9    20,441,854    25,846,848      81,079,954     102,359,087      3406ms
+Phase4MLEdgeSymUDCenter:10    57,963,527    83,810,375     230,361,431     332,720,518     10708ms
+Phase4MLEdgeSymUDCenter:11    55,470,719   139,281,094     220,472,982     553,193,500     18513ms
+Phase4MLEdgeSymUDCenter:12     5,829,269   145,110,363      23,022,104     576,215,604     19364ms
+Phase4MLEdgeSymUDCenter:13         8,037   145,118,400          24,396     576,240,000     19766ms
+
+Phase4MLEdgeSymRLCenter: 0             3             3               3               3         0ms
+Phase4MLEdgeSymRLCenter: 1             6             9              12              15         3ms
+Phase4MLEdgeSymRLCenter: 2            39            48             108             123         6ms
+Phase4MLEdgeSymRLCenter: 3           254           302             848             971         9ms
+Phase4MLEdgeSymRLCenter: 4         1,805         2,107           6,615           7,586        15ms
+Phase4MLEdgeSymRLCenter: 5        12,825        14,932          49,221          56,807        19ms
+Phase4MLEdgeSymRLCenter: 6        80,814        95,746         317,285         374,092        29ms
+Phase4MLEdgeSymRLCenter: 7       411,854       507,600       1,634,078       2,008,170        79ms
+Phase4MLEdgeSymRLCenter: 8     1,435,684     1,943,284       5,709,833       7,718,003       238ms
+Phase4MLEdgeSymRLCenter: 9     2,500,380     4,443,664       9,942,263      17,660,266       703ms
+Phase4MLEdgeSymRLCenter:10     1,666,798     6,110,462       6,612,508      24,272,774       995ms
+Phase4MLEdgeSymRLCenter:11       284,291     6,394,753       1,120,068      25,392,842      1043ms
+Phase4MLEdgeSymRLCenter:12         2,303     6,397,056           8,758      25,401,600      1060ms
+
+Phase5Center: 0             1             1         0ms
+Phase5Center: 1             4             5         0ms
+Phase5Center: 2            42            47         4ms
+Phase5Center: 3           280           327         5ms
+Phase5Center: 4         1,691         2,018         5ms
+Phase5Center: 5         8,806        10,824         7ms
+Phase5Center: 6        36,264        47,088        11ms
+Phase5Center: 7        77,966       125,054        23ms
+Phase5Center: 8        46,518       171,572        28ms
+Phase5Center: 9         4,828       176,400        29ms
+
+Phase5LEdgeSymCenter: 0             1             1               1               1         0ms
+Phase5LEdgeSymCenter: 1             1             2               4               5        14ms
+Phase5LEdgeSymCenter: 2             7             9              30              35        27ms
+Phase5LEdgeSymCenter: 3            41            50             196             231        39ms
+Phase5LEdgeSymCenter: 4           225           275           1,315           1,546        51ms
+Phase5LEdgeSymCenter: 5         1,343         1,618           8,527          10,073        64ms
+Phase5LEdgeSymCenter: 6         7,956         9,574          54,089          64,162        78ms
+Phase5LEdgeSymCenter: 7        47,388        56,962         335,196         399,358        96ms
+Phase5LEdgeSymCenter: 8       270,792       327,754       1,983,675       2,383,033       141ms
+Phase5LEdgeSymCenter: 9     1,383,928     1,711,682      10,389,623      12,772,656       304ms
+Phase5LEdgeSymCenter:10     5,354,156     7,065,838      40,762,934      53,535,590       858ms
+Phase5LEdgeSymCenter:11    11,247,225    18,313,063      86,158,440     139,694,030      2539ms
+Phase5LEdgeSymCenter:12     7,171,765    25,484,828      54,686,120     194,380,150      3443ms
+Phase5LEdgeSymCenter:13       426,062    25,910,890       3,185,914     197,566,064      3544ms
+Phase5LEdgeSymCenter:14           310    25,911,200           1,936     197,568,000      3607ms

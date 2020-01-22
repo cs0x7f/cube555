@@ -44,8 +44,8 @@ run: $(DIST)
 	@java -jar $(DIST)
 
 test: $(DIST) $(TEST)
-	@$(JAVAC) -d . -cp $(DIST) $(TEST)
-	@java -cp .:$(DIST) test
+	@$(JAVAC) -d dist -cp $(DIST) $(TEST)
+	@java -cp dist:$(DIST) test
 
 clean:
 	@rm -rf dist/*

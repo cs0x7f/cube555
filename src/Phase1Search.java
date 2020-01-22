@@ -23,15 +23,13 @@ class Phase1Search extends PhaseSearch {
 	    ux1, ux2, ux3, rx1, rx2, rx3, fx1, fx2, fx3, dx1, dx2, dx3, lx1, lx2, lx3, bx1, bx2, bx3
 	};
 
-	static int[][] TCenterMove;
-	static int[][] XCenterMove;
-
 	static PruningTable TCenterPrun;
 	static PruningTable XCenterPrun;
+	static PruningTable CenterSymPrun;
 
 	static PruningTable TCenterSymPrun;
 	static PruningTable XCenterSymPrun;
-	static int[] TCenterSym2Raw;
+	static int[] TCenterSym2RawF;
 	static int[] TCenterRaw2Sym;
 	static int[][] TCenterSymMove;
 	static int[] XCenterSym2Raw;
@@ -47,7 +45,7 @@ class Phase1Search extends PhaseSearch {
 	static void initCenter() {
 		Phase1Center center = new Phase1Center();
 		int symCnt = 0;
-		TCenterSym2Raw = new int[46935];
+		TCenterSym2RawF = new int[46935 * 16];
 		TCenterRaw2Sym = new int[735471];
 		int[] TCenterSelfSym = new int[46935];
 		for (int i = 0; i < TCenterRaw2Sym.length; i++) {
@@ -58,6 +56,7 @@ class Phase1Search extends PhaseSearch {
 			for (int sym = 0; sym < 16; sym++) {
 				int idx = center.getTCenter();
 				TCenterRaw2Sym[idx] = symCnt << 4 | sym;
+				TCenterSym2RawF[symCnt << 4 | sym] = idx;
 				if (idx == i) {
 					TCenterSelfSym[symCnt] |= 1 << sym;
 				}
@@ -69,13 +68,12 @@ class Phase1Search extends PhaseSearch {
 					center.doConj(2);
 				}
 			}
-			TCenterSym2Raw[symCnt] = i;
 			symCnt++;
 		}
 		TCenterSymMove = new int[symCnt][VALID_MOVES.length];
 		for (int i = 0; i < symCnt; i++) {
 			for (int m = 0; m < VALID_MOVES.length; m++) {
-				center.setTCenter(TCenterSym2Raw[i]);
+				center.setTCenter(TCenterSym2RawF[i << 4]);
 				center.doMove(m);
 				TCenterSymMove[i][m] = TCenterRaw2Sym[center.getTCenter()];
 			}
@@ -116,20 +114,48 @@ class Phase1Search extends PhaseSearch {
 			}
 		}
 
+		SymCoord XCenterSymCoord = new TableSymCoord(XCenterSymMove, XCenterSelfSym, 16);
+
 		TCenterSymPrun = new PruningTable(
 		    new TableSymCoord(TCenterSymMove, TCenterSelfSym, 16),
 		    null, "Phase1TCenterSym");
 
 		XCenterSymPrun = new PruningTable(
-		    new TableSymCoord(XCenterSymMove, XCenterSelfSym, 16),
+		    XCenterSymCoord,
 		    null, "Phase1XCenterSym");
+
+		SymMove = CubieCube.getSymMove(VALID_MOVES, 16);
+
+		CenterSymPrun = new PruningTable(XCenterSymCoord,
+		new RawCoord() {
+			{
+				N_IDX = 735471;
+			}
+			void set(int idx) {
+				this.idx = TCenterRaw2Sym[idx];
+			}
+			int getMoved(int move) {
+				int ret = TCenterSymMove[idx >> 4][SymMove[idx & 0xf][move]];
+				ret = ret & ~0xf | CubieCube.SymMult[ret & 0xf][idx & 0xf];
+				return TCenterSym2RawF[ret];
+			}
+			int getConj(int idx, int conj) {
+				idx = TCenterRaw2Sym[idx];
+				idx = idx & ~0xf | CubieCube.SymMultInv[idx & 0xf][conj];
+				return TCenterSym2RawF[idx];
+			}
+		}, null, 7, 1 << 26, "Phase1CenterSym");
 	}
 
 	static class Phase1Node extends Node {
 		int tCenter;
 		int xCenter;
 		int getPrun() {
-			return Math.max(TCenterSymPrun.getPrun(tCenter >> 4), XCenterSymPrun.getPrun(xCenter >> 4));
+			return Math.max(
+			           Math.max(
+			               TCenterSymPrun.getPrun(tCenter >> 4),
+			               XCenterSymPrun.getPrun(xCenter >> 4)),
+			           CenterSymPrun.getPrun(xCenter >> 4, TCenterSym2RawF[tCenter & ~0xf | CubieCube.SymMultInv[tCenter & 0xf][xCenter & 0xf]]));
 		}
 		int doMovePrun(Node node0, int move, int maxl) {
 			Phase1Node node = (Phase1Node) node0;

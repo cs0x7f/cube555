@@ -7,7 +7,7 @@ public class Search {
 
 	public static final int USE_SEPARATOR = 0x1;
 
-	static int phase1SolsSize = 10;
+	static int phase1SolsSize = 200;
 	static int phase2SolsSize = 500;
 	static int phase3SolsSize = 500;
 	static int phase4SolsSize = 500;

@@ -528,6 +528,7 @@ class Util {
 		int N_STATE;
 		int N_STATE2;
 		int[] Prun;
+		int TABLE_MASK = 0x7fffffff;
 
 		private static void setPrun(int[] Prun, int idx, int xorval) {
 			Prun[idx >> 3] ^= xorval << (idx << 2);
@@ -558,6 +559,10 @@ class Util {
 
 		PruningTable(SymCoord symCoord, RawCoord rawCoord, int[][] Solved, String filename) {
 			initPrunTable(symCoord, rawCoord, Solved, filename);
+		}
+
+		PruningTable(SymCoord symCoord, RawCoord rawCoord, int[][] Solved, int maxl, int TABLE_SIZE, String filename) {
+			initPrunTablePartial(symCoord, rawCoord, Solved, maxl, TABLE_SIZE, filename);
 		}
 
 		PruningTable(int[][] Move, int[] Solved, String filename) {
@@ -594,6 +599,102 @@ class Util {
 					return Move1[idx][move] * N_STATE2 + Move2[state2][move];
 				}
 			}, Solved, filename);
+		}
+
+		private void initPrunTablePartial(SymCoord symCoord, RawCoord rawCoord, int[][] Solved, int maxl, int TABLE_SIZE, String filename) {
+			N_STATE = symCoord.N_IDX * rawCoord.N_IDX;
+			N_STATE2 = rawCoord.N_IDX;
+			int N_SYM = symCoord.N_SYM;
+			int N_MOVES = symCoord.N_MOVES;
+			TABLE_MASK = TABLE_SIZE - 1;
+			Prun = (int[]) Tools.LoadFromFile(filename + "Prun.jpdata");
+			if (Prun != null) {
+				return;
+			}
+			if (Solved == null) {
+				Solved = new int[][] {{0, 0}};
+			}
+			java.util.HashMap<Long, Byte> PrunP = new java.util.HashMap<Long, Byte>();
+			int done = 0;
+			long realDone = 0;
+			int depth = 0;
+			for (int[] val : Solved) {
+				long idx = val[0] * (long) N_STATE2 + val[1];
+				PrunP.put(idx, (byte) 0);
+				done++;
+				realDone += N_SYM / Integer.bitCount(symCoord.SelfSym[val[0]]);
+			}
+			int cumDone = done;
+			long cumRealDone = cumDone;
+			long startTime = System.nanoTime();
+			do {
+				System.out.println(String.format("%s:%2d%,14d%,14d%,16d%,16d%10dms", filename,
+				                                 depth, done, cumDone, realDone, cumRealDone,
+				                                 (System.nanoTime() - startTime) / 1000000));
+				done = 0;
+				realDone = 0;
+				byte fill = (byte) (depth + 1);
+				java.util.HashMap<Long, Byte> PrunPClone = (java.util.HashMap<Long, Byte>) PrunP.clone();
+				for (java.util.Map.Entry<Long, Byte> entry : PrunPClone.entrySet()) {
+					if (entry.getValue() != depth) {
+						continue;
+					}
+					long i = entry.getKey();
+					symCoord.set((int) (i / N_STATE2));
+					rawCoord.set((int) (i % N_STATE2));
+					for (int m = 0; m < N_MOVES; m++) {
+						int newSym = symCoord.getMoved(m);
+						int newRaw = rawCoord.getConj(rawCoord.getMoved(m), newSym % N_SYM);
+						newSym /= N_SYM;
+						long newIdx = newSym * (long) N_STATE2 + newRaw;
+						if (PrunP.putIfAbsent(newIdx, fill) != null) {
+							continue;
+						}
+						done++;
+						realDone += N_SYM / Integer.bitCount(symCoord.SelfSym[newSym]);
+						for (int j = 1, symState = symCoord.SelfSym[newSym]; (symState >>= 1) != 0; j++) {
+							if ((symState & 1) != 1) {
+								continue;
+							}
+							long newIdx2 = newSym * (long) N_STATE2 + rawCoord.getConj(newRaw, j);
+							if (PrunP.putIfAbsent(newIdx2, fill) != null) {
+								continue;
+							}
+							done++;
+							realDone += N_SYM / Integer.bitCount(symCoord.SelfSym[newSym]);
+						}
+					}
+				}
+				cumDone += done;
+				cumRealDone += realDone;
+				depth++;
+			} while (done > 0 && depth < maxl);
+			System.out.println(String.format("%s:%2d%,14d%,14d%,16d%,16d%10dms", filename,
+			                                 depth, done, cumDone, realDone, cumRealDone,
+			                                 (System.nanoTime() - startTime) / 1000000));
+
+			Prun = new int[TABLE_SIZE >> 3];
+			for (int i = 0; i < Prun.length; i++) {
+				Prun[i] = 0x11111111 * (maxl + 1);
+			}
+			for (java.util.Map.Entry<Long, Byte> entry : PrunP.entrySet()) {
+				int idx = (int) (entry.getKey() & TABLE_MASK);
+				int val = entry.getValue();
+				int prun = getPrun(Prun, idx);
+				if (val < prun) {
+					setPrun(Prun, idx, val ^ prun);
+				}
+			}
+			int[] depthCnt = new int[16];
+			for (int i = 0; i < TABLE_SIZE; i++) {
+				depthCnt[getPrun(Prun, i)]++;
+			}
+			for (int i = 0; i < 16; i++) {
+				if (depthCnt[i] != 0) {
+					System.out.println(String.format("%s-%2d%,14d", filename, i, depthCnt[i]));
+				}
+			}
+			Tools.SaveToFile(filename + "Prun.jpdata", Prun);
 		}
 
 		private void initPrunTable(SymCoord symCoord, RawCoord rawCoord, int[][] Solved, String filename) {
@@ -750,11 +851,11 @@ class Util {
 		}
 
 		int getPrun(int state1, int state2) {
-			return getPrun(Prun, state1 * N_STATE2 + state2);
+			return getPrun(Prun, (state1 * N_STATE2 + state2) & TABLE_MASK);
 		}
 
 		int getPrun(int state) {
-			return getPrun(Prun, state);
+			return getPrun(Prun, state & TABLE_MASK);
 		}
 	}
 }
